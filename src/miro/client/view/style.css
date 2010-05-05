@@ -1,0 +1,58 @@
+.cellule {
+    background-color: cyan;
+    width: 5.0em;
+}
+
+.titleOfFirstColumn {
+    width: 180px;
+    height:20px;
+    color: black;
+    font-weight: bold;
+    border-right-color:black;
+    border-right-style:double;
+}
+
+.titleOfFirstRow {
+    text-align: center;
+    color: black;
+    font-weight: bolder;
+    font-size:12.5px;
+    border-bottom-color:black;
+    border-bottom-style:double;
+}
+
+.gwt-PushButton {
+    width: 50px;
+    height: 50px;
+}
+
+.gwt-TextBox {
+    width: 75px;
+    height:18px;
+    text-align: center;
+}
+
+.gwt-TextBox-readonly {
+	background:gray;
+	color:black;
+	font-weight:bolder;
+}
+
+.red {
+    text-align:center;
+    color:red;
+}
+
+.green {
+    text-align: center;
+    color: green;
+}
+
+.orange {
+    text-align: center;
+    color: orange;
+}
+
+.textbox-nameOfProjectOrPerson {
+    cursor : pointer;
+}

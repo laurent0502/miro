@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='mirov2'>
+
+  <!-- Définit une dépendance entre modules -->
+  <inherits name='com.google.gwt.user.User'/>
+  <inherits name='com.google.gwt.user.theme.standard.Standard'/>
+  <inherits name="com.googlecode.objectify.Objectify"/>
+  <inherits name="gwtupload.GWTUpload"/>
+
+  <!-- Point d'entrée de l'application -->
+  <entry-point class='miro.client.MiroV2'/>
+
+  <servlet path="/sampleUploadServlet" class="miro.server.SampleUploadServlet"/>
+  
+  <!-- Ensemble des packages qui doivent être pris en compte par le compilateur GWT-->
+  <source path='client'/>
+  <source path='shared'/>
+
+</module>

@@ -1,0 +1,25 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'
+             xmlns:miroView='urn:import:miro.client.view'>
+
+	<!-- unit indique les unités utilisées pour exprimer une taille-->
+<<<<<<< HEAD
+    <g:DockLayoutPanel unit='EM'>
+=======
+    <g:DockLayoutPanel unit='EM' ui:field="dockPanel">
+>>>>>>> test2
+
+        <g:north size="5">
+            <miroView:TopPanel ui:field="topPanel"/>
+        </g:north>
+
+        <g:center>
+            <miroView:CenterPanel ui:field="centerPanel"/>
+        </g:center>
+
+        <g:south size="2">
+        	<miroView:BottomPanel ui:field="bottomPanel"/>
+        </g:south>
+
+    </g:DockLayoutPanel>
+</ui:UiBinder>
