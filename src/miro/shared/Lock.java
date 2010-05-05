@@ -9,6 +9,12 @@ public class Lock {
 	
 	private boolean isLocked = false;
 	
+	public Lock(){}
+	
+	public Lock(Long id){
+		this.id = id;
+	}
+	
 	public boolean isLocked(){
 		return isLocked;
 	}

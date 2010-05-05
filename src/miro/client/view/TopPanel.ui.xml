@@ -5,20 +5,11 @@
 	<g:AbsolutePanel ui:field="absolutePanel">
 		<g:Label text="Choix de la personne :" ui:field="labPersonOrProjectChoice" />
 		<g:ListBox ui:field="personOrProjectChoiceList" />
-<<<<<<< HEAD
-		<g:Label text="Affecter un projet :" ui:field="labProjectOrPersonAffectChoice" />
-		<g:ListBox ui:field="projectOrPersonAffectChoiceList" />
-		<gwtUpload:SingleUploader ui:field="singleUploader" fileInputSize="25" />
-		<!--  <g:FileUpload ui:field="fileUpload"/>-->
-=======
 		<g:Label text="Affecter un projet :" ui:field="labPersonOrProjectAffectChoice" />
 		<g:ListBox ui:field="personOrProjectAffectChoiceList" />
 		<g:Label text="Importer un fichier :" ui:field="labImportFile"/>
 		<g:FormPanel ui:field="formPanel"> 
 		</g:FormPanel> 
-				
-		<!--  <gwtUpload:SingleUploader ui:field="singleUploader" fileInputSize="25" /> -->
->>>>>>> test2
 	</g:AbsolutePanel>
 
 </ui:UiBinder>

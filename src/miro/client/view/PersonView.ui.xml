@@ -3,11 +3,7 @@
              xmlns:miroView='urn:import:miro.client.view'>
 
 	<!-- unit indique les unités utilisées pour exprimer une taille-->
-<<<<<<< HEAD
-    <g:DockLayoutPanel unit='EM'>
-=======
     <g:DockLayoutPanel unit='EM' ui:field="dockPanel">
->>>>>>> test2
 
         <g:north size="5">
             <miroView:TopPanel ui:field="topPanel"/>

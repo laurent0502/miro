@@ -27,7 +27,8 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 			NullPointerException {
 		ObjectifyService.register(Lock.class);
 		Objectify ofy = ObjectifyService.begin();
-		Lock lock = (Lock) ofy.find(new Key(Lock.class, 58002));
+		Lock lock = (Lock) ofy.find(new Key(Lock.class, 1));
+		//Lock lock = (Lock) ofy.find(new Key(Lock.class, 58002));
 		//ofy.getTxn().
 		if (lock.isLocked()) {
 			if (locked)
@@ -84,11 +85,13 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 
 	public List<Assignment> getAssignments() {
 		ObjectifyService.register(Assignment.class);
+		ObjectifyService.register(Lock.class);
 		List<Assignment> assignmentList = new ArrayList<Assignment>();
 
+		
 		//Les six lignes suivantes sont des tests
 		Objectify ofy2 = ObjectifyService.beginTransaction();
-		ofy2.put(new Assignment(new Project("nova"),new Person("bart","simpson")));
+		ofy2.put(new Lock(1L));
 		ofy2.getTxn().commit();
 		
 		try {
