@@ -29,13 +29,5 @@ public class PersonView {
     public PersonView(){
         RootLayoutPanel root = RootLayoutPanel.get();
         root.add(rootElement);
-
-        initBottomPanel();
     }
-    
-    private void initBottomPanel(){
-    	bottomPanel.setTopPanel(topPanel);
-    	bottomPanel.setCenterPanel(centerPanel);
-    }
-    
 }

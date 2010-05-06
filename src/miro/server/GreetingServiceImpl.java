@@ -28,8 +28,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		ObjectifyService.register(Lock.class);
 		Objectify ofy = ObjectifyService.begin();
 		Lock lock = (Lock) ofy.find(new Key(Lock.class, 1));
-		//Lock lock = (Lock) ofy.find(new Key(Lock.class, 58002));
-		//ofy.getTxn().
+		// Lock lock = (Lock) ofy.find(new Key(Lock.class, 58002));
 		if (lock.isLocked()) {
 			if (locked)
 				throw new IllegalArgumentException(
@@ -49,10 +48,6 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		Person person = new Person("bagno", "laurent");
 		Person person2 = new Person("alfred", "dupond");
 		Person person3 = new Person("Jean", "dujardin");
-
-		// person.setElementOfHolidaysList(1, new Record(5, new Time(2, 2010)));
-		// person.setElementForTrainingList(2, new Record(6, new Time(3,
-		// 2010)));
 
 		Project project = new Project("nova");
 		Project project2 = new Project("chancellerie");
@@ -85,18 +80,11 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 
 	public List<Assignment> getAssignments() {
 		ObjectifyService.register(Assignment.class);
-		ObjectifyService.register(Lock.class);
 		List<Assignment> assignmentList = new ArrayList<Assignment>();
 
-		
-		//Les six lignes suivantes sont des tests
-		Objectify ofy2 = ObjectifyService.beginTransaction();
-		ofy2.put(new Lock(1L));
-		ofy2.getTxn().commit();
-		
 		try {
 			Objectify ofy = ObjectifyService.begin();
-			
+
 			Query<Assignment> query = ofy.query(Assignment.class);
 
 			for (Assignment assignmentFromList : query) {
@@ -110,8 +98,8 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 	public String updateAssignments(List<Person> personList,
 			List<Assignment> assignmentList) {
 		List<Assignment> assignmentList2 = getAssignments();
-		Logger.getLogger(this.getClass()).error("put data");
-		
+		Logger.getLogger(this.getClass()).info("updateAssignment");
+
 		for (Assignment assignment : assignmentList) {
 
 			try {
@@ -132,13 +120,15 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		updateInfosPersonInAssignmentList(personList, assignmentList2);
 		
 		putData(assignmentList2);
-		Logger.getLogger(this.getClass()).error("put data");
+		Logger.getLogger(this.getClass()).info("put data");
+		
+		setLocked(false);
 		return "" + assignmentList2.size();
 	}
 
 	private void updateInfosPersonInAssignmentList(List<Person> personList,
 			List<Assignment> assignmentList2) {
-		
+
 		for (int i = 0; i < personList.size(); i++) {
 			Person person = personList.get(i);
 			for (int j = 0; j < assignmentList2.size(); j++) {
@@ -152,7 +142,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 	void putData(List<Assignment> assignmentList) {
 		ObjectifyService.register(Assignment.class);
 		Objectify ofy = null;
-		
+
 		for (Assignment assignment : assignmentList) {
 			try {
 				ofy = ObjectifyService.beginTransaction();
@@ -166,8 +156,8 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 	public String getMonthOfDate() {
 		return "" + calendar.get(GregorianCalendar.MONTH);
 	}
-	
-	public String getYearOfDate(){
-		return ""+calendar.get(GregorianCalendar.YEAR);
+
+	public String getYearOfDate() {
+		return "" + calendar.get(GregorianCalendar.YEAR);
 	}
 }

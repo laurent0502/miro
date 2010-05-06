@@ -1,12 +1,13 @@
 package miro.client.view;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import miro.client.db.MiroAccessDB;
 import miro.shared.Assignment;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -18,9 +19,7 @@ import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 
-
-public class BottomPanel extends Composite implements EventListener,HasHandlers{
-
+public class BottomPanel extends Composite {
 
 	private static BottomPanelUiBinder uiBinder = GWT
 			.create(BottomPanelUiBinder.class);
@@ -36,9 +35,8 @@ public class BottomPanel extends Composite implements EventListener,HasHandlers{
 
 	@UiField
 	Button lockButton;
-
-	private TopPanel topPanel;
-	private CenterPanel centerPanel;
+	
+	private static List<EventListener> listenersList = new ArrayList<EventListener>();
 
 	private final AsyncCallback<List<Assignment>> CALLBACK2 = new AsyncCallback<List<Assignment>>() {
 
@@ -48,24 +46,13 @@ public class BottomPanel extends Composite implements EventListener,HasHandlers{
 
 		@Override
 		public void onSuccess(List<Assignment> result) {
-			MiroState.updateViewState(result);
-			topPanel.refreshPersonOrProjectAffectChoiceList();
-			centerPanel.refreshCenterPanel();
 
-			MiroAccessDB.setLocked(false, CALLBACK3);
-		}
-	};
-	
-	private final AsyncCallback CALLBACK3 = new AsyncCallback() {
-
-		@Override
-		public void onFailure(Throwable caught) {
-		}
-
-		@Override
-		public void onSuccess(Object result) {
 			lockButton.setEnabled(true);
 			saveButton.setEnabled(false);
+			
+			MiroState.updateViewState(result);
+			Window.alert("message");
+			BottomPanel.this.notifyListeners();
 		}
 	};
 	
@@ -86,12 +73,22 @@ public class BottomPanel extends Composite implements EventListener,HasHandlers{
 		initWidget(uiBinder.createAndBindUi(this));
 		initAbsolutePanel();
 		initWindowCloseListener();
-		TopPanel.addEventListener(this);
 	}
 
+	public static void addEventListener(EventListener eventListener){
+		listenersList.add(eventListener);
+	}
+	
+	private void notifyListeners(){
+		for(EventListener eventListener : listenersList){
+			Window.alert("passe dedans");
+			eventListener.notifyChange(this);
+		}
+	}
+	
 	@UiHandler("saveButton")
 	void onClick(ClickEvent e) {
-
+		
 		MiroAccessDB.updateAssignments(MiroState.getPersonList(),
 				MiroState.getAssignmentList(), CALLBACK);
 	}
@@ -110,9 +107,10 @@ public class BottomPanel extends Composite implements EventListener,HasHandlers{
 			public void onSuccess(Object result) {
 				lockButton.setEnabled(false);
 				saveButton.setEnabled(true);
+				BottomPanel.this.notifyListeners();
+				//BottomPanel.this.fireEvent(new LockedEvent());
 			}
 		};
-
 		MiroAccessDB.setLocked(true, callback);
 	}
 
@@ -120,14 +118,6 @@ public class BottomPanel extends Composite implements EventListener,HasHandlers{
 		absolutePanel.setSize("900px", "50px");
 		absolutePanel.setWidgetPosition(lockButton, 25, 0);
 		absolutePanel.setWidgetPosition(saveButton, 90, 0);
-	}
-
-	void setCenterPanel(CenterPanel centerPanel) {
-		this.centerPanel = centerPanel;
-	}
-
-	void setTopPanel(TopPanel topPanel) {
-		this.topPanel = topPanel;
 	}
 
 	private void initWindowCloseListener() {
@@ -156,16 +146,4 @@ public class BottomPanel extends Composite implements EventListener,HasHandlers{
 			}
 		});
 	}
-
-	@Override
-	public void notifyChange() {
-		if(PartagedDataBetweenPanel.isImporting){
-			lockButton.setEnabled(false);
-			saveButton.setEnabled(false);
-		}
-		else{
-			lockButton.setEnabled(true);
-		}
-	}
-
 }

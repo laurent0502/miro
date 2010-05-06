@@ -25,6 +25,7 @@ import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 
@@ -57,12 +58,24 @@ public class TopPanel extends Composite implements EventListener {
 	private List<Person> personNotAssignedForProject;
 	private static List<EventListener> eventListenerList = new ArrayList<EventListener>();
 	private Button submitButton;
-	
+
 	public TopPanel() {
 		initWidget(ourUiBinder.createAndBindUi(this));
 		initAbsolutePanel();
 		initTopPanel();
+		ClickHandler handler = new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				submitButton.setEnabled(true);
+				Window.alert("on click");
+			}
+		};
+
+		addHandler(handler, LockedEvent.getType());
+
+		// TODO REMOVE
 		CenterPanel.addEventListener(this);
+		BottomPanel.addEventListener(this);
 	}
 
 	private void initTopPanel() {
@@ -72,7 +85,6 @@ public class TopPanel extends Composite implements EventListener {
 	}
 
 	private void disabledTopPanel() {
-
 		personOrProjectChoiceList.setEnabled(false);
 		personOrProjectAffectChoiceList.setEnabled(false);
 		submitButton.setEnabled(false);
@@ -84,14 +96,13 @@ public class TopPanel extends Composite implements EventListener {
 		submitButton.setEnabled(true);
 	}
 
-
 	public static void addEventListener(EventListener eventListener) {
 		eventListenerList.add(eventListener);
 	}
 
 	private void notifyListeners() {
 		for (EventListener eventListener : eventListenerList) {
-			eventListener.notifyChange();
+			eventListener.notifyChange(this);
 		}
 	}
 
@@ -101,13 +112,13 @@ public class TopPanel extends Composite implements EventListener {
 				MARGIN_TOP_OF_COMPONENTS);
 		absolutePanel.setWidgetPosition(personOrProjectChoiceList, 170,
 				MARGIN_TOP_OF_COMPONENTS);
-		absolutePanel.setWidgetPosition(labPersonOrProjectAffectChoice, 410,
+		absolutePanel.setWidgetPosition(labPersonOrProjectAffectChoice, 450,
 				MARGIN_TOP_OF_COMPONENTS);
-		absolutePanel.setWidgetPosition(personOrProjectAffectChoiceList, 550,
+		absolutePanel.setWidgetPosition(personOrProjectAffectChoiceList, 590,
 				MARGIN_TOP_OF_COMPONENTS);
-		absolutePanel.setWidgetPosition(labImportFile, 830,
+		absolutePanel.setWidgetPosition(labImportFile, 870,
 				MARGIN_TOP_OF_COMPONENTS);
-		absolutePanel.setWidgetPosition(formPanel, 960,
+		absolutePanel.setWidgetPosition(formPanel, 1000,
 				MARGIN_TOP_OF_COMPONENTS);
 
 		formPanel.setAction(GWT.getModuleBaseURL() + "SampleUploadServlet");
@@ -122,14 +133,16 @@ public class TopPanel extends Composite implements EventListener {
 		formPanel.setWidget(panel);
 
 		submitButton = new Button("Submit", new ClickHandler() {
+
 			@Override
 			public void onClick(ClickEvent event) {
+				PartagedDataBetweenPanel.isImporting = true;
 				/*
-				 * Callback utilisé lors de l'appel au serveur afin de sauver les
-				 * données avant de soumettre le formulaire au servlet en cas de
-				 * succès
+				 * Callback utilisé lors de l'appel au serveur afin de sauver
+				 * les données avant de soumettre le formulaire au servlet en
+				 * cas de succès
 				 */
-				AsyncCallback callback = new AsyncCallback() {
+				/*AsyncCallback callback = new AsyncCallback() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -142,8 +155,9 @@ public class TopPanel extends Composite implements EventListener {
 				};
 				MiroAccessDB.updateAssignments(personList, MiroState
 						.getAssignmentList(), callback);
-				
+				 */
 				disabledTopPanel();
+				formPanel.submit();
 				notifyListeners();
 			}
 		});
@@ -178,10 +192,12 @@ public class TopPanel extends Composite implements EventListener {
 							.indexOf("</pre>"));
 					Window.alert("-" + error + "-");
 				}
+				PartagedDataBetweenPanel.isImporting = false;
 				enabledTopPanel();
 				notifyListeners();
 			}
 		});
+		submitButton.setEnabled(false);
 	}
 
 	private boolean isResponseServerOk(String response) {
@@ -325,7 +341,7 @@ public class TopPanel extends Composite implements EventListener {
 			public void onChange(ChangeEvent changeEvent) {
 				int selectedIndex = personOrProjectAffectChoiceList
 
-						.getSelectedIndex();
+				.getSelectedIndex();
 
 				switch (PartagedDataBetweenPanel.viewType) {
 				case PERSON_VIEW:
@@ -369,6 +385,10 @@ public class TopPanel extends Composite implements EventListener {
 
 	}
 
+	private void setEnabledSubmitButton() {
+		submitButton.setEnabled(!submitButton.isEnabled());
+	}
+
 	private void refreshPersonOrProjectChoiceList() {
 
 		personOrProjectChoiceList.clear();
@@ -398,7 +418,10 @@ public class TopPanel extends Composite implements EventListener {
 	}
 
 	@Override
-	public void notifyChange() {
+	public void notifyChange(Widget widget) {
+		if (widget instanceof BottomPanel)
+			setEnabledSubmitButton();
+		
 		refreshLabPersonOrProjectChoice();
 		refreshLabProjectOrPersonAffectChoice();
 		refreshPersonOrProjectChoiceList();

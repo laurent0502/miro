@@ -1,5 +1,15 @@
 package miro.client.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import miro.client.db.MiroAccessDB;
+import miro.shared.Assignment;
+import miro.shared.Person;
+import miro.shared.Project;
+import miro.shared.Record;
+import miro.shared.Time;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -13,12 +23,9 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
-
-import miro.client.db.MiroAccessDB;
-import miro.shared.*;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.gwt.user.client.ui.Widget;
 
 public class CenterPanel extends Composite implements EventListener {
 
@@ -28,7 +35,7 @@ public class CenterPanel extends Composite implements EventListener {
 		CssResource css();
 	}
 
-	interface CenterPanelUiBinder extends UiBinder<FlexTable, CenterPanel> {
+	interface CenterPanelUiBinder extends UiBinder<ScrollPanel, CenterPanel> {
 	}
 
 	private static CenterPanelUiBinder ourUiBinder = GWT
@@ -46,7 +53,7 @@ public class CenterPanel extends Composite implements EventListener {
 	 */
 	private int indexDeparture;
 	private int currentMonth;
-
+	
 	@UiField
 	FlexTable personArray;
 
@@ -68,10 +75,13 @@ public class CenterPanel extends Composite implements EventListener {
 			}
 		};
 		MiroAccessDB.getMonthOfDate(callback);
+
 		TopPanel.addEventListener(this);
+		BottomPanel.addEventListener(this);
 	}
 
 	public static void addEventListener(EventListener eventListener) {
+		
 		eventListenerList.add(eventListener);
 	}
 
@@ -674,18 +684,18 @@ public class CenterPanel extends Composite implements EventListener {
 	}
 
 	@Override
-	public void notifyChange() {
-		if (PartagedDataBetweenPanel.isImporting) {
-			disabledAllTitleRow();
-			disabledAllProjectRow();
-		} else {
-			refreshCenterPanel();
+	public void notifyChange(Widget widget) {
+		refreshCenterPanel();
+		
+		if(PartagedDataBetweenPanel.isImporting){
+			this.disabledAllTitleRow();
+			this.disabledAllProjectRow();
 		}
 	}
 
 	private void notifyListeners() {
 		for (EventListener eventListener : eventListenerList) {
-			eventListener.notifyChange();
+			eventListener.notifyChange(this);
 		}
 	}
 

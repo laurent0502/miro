@@ -24,10 +24,20 @@ public class Person implements Serializable ,Comparable{
 	}
 
 	public Person(String lastName, String firstName) {
-		this.lastName = lastName;
-		lastName = lastName.toUpperCase();
+		this.lastName = lastName.toUpperCase();
 		this.firstName = firstName;
+		
+		replaceSpecialCharactersOfFirstName();
 		initLists();
+	}
+	
+	private void replaceSpecialCharactersOfFirstName(){
+		
+		firstName = firstName.replace("é","e");
+		firstName = firstName.replace("è","e");
+		firstName = firstName.replace("ô","o");
+		firstName = firstName.replace("î","i");
+		
 	}
 
 	private void initLists() {
