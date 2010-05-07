@@ -71,6 +71,7 @@ public class TopPanel extends Composite implements EventListener {
 			}
 		};
 		//
+		
 		addHandler(handler, LockedEvent.getType());
 
 		// TODO REMOVE

@@ -8,7 +8,7 @@
         width : 100px;
         }
 	</ui:style>
-	<!--  -->
+	<!-- -->
 	<g:AbsolutePanel ui:field="absolutePanel">
 		<g:Button styleName="button" text="LOCK" ui:field="lockButton" />
 		<g:Button styleName="button" text="SAVE" ui:field="saveButton" enabled='false'/>

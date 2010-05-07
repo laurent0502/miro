@@ -11,6 +11,7 @@ public class PersonView {
 	interface PersonViewUiBinder extends UiBinder<DockLayoutPanel, PersonView> {
     }
 	//
+	
     static PersonViewUiBinder ourUiBinder = GWT.create(PersonViewUiBinder.class);
 
     //TabLayoutPanel rootElement = ourUiBinder.createAndBindUi(this);
