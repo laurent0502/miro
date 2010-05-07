@@ -21,7 +21,6 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 //
-
 public class SampleUploadServlet extends HttpServlet {
 	private Time time;
 	private List<Person> personList = new ArrayList<Person>();

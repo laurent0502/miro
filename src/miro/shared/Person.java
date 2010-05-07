@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 public class Person implements Serializable ,Comparable{
 //
-	
 	private static final long serialVersionUID = 1L;
 
 	private String lastName;
