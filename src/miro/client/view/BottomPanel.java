@@ -20,7 +20,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 
 public class BottomPanel extends Composite {
-
+//
 	private static BottomPanelUiBinder uiBinder = GWT
 			.create(BottomPanelUiBinder.class);
 

@@ -34,7 +34,7 @@ public class CenterPanel extends Composite implements EventListener {
 		@Source("style.css")
 		CssResource css();
 	}
-
+	//
 	interface CenterPanelUiBinder extends UiBinder<ScrollPanel, CenterPanel> {
 	}
 

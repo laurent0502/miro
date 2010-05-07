@@ -10,7 +10,7 @@ import miro.shared.Person;
 import miro.shared.Project;
 import miro.shared.Record;
 import miro.shared.Time;
-
+//
 public class MiroState {
 	private static List<Person> personList = new ArrayList<Person>();
 	private static List<Project> projectList = new ArrayList<Project>();
