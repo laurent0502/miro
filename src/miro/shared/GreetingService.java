@@ -1,18 +1,21 @@
 package miro.shared;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
-import java.util.List;
-
-/**
- * The client side stub for the RPC service.
- */
 @RemoteServiceRelativePath("greetingService")
 public interface GreetingService extends RemoteService {
 
-    List<Assignment> getAssignments();
-    String updateAssignments(List<Person> personList,List<Assignment> assignmentList);
-    void setLocked(boolean locked)throws IllegalArgumentException,NullPointerException;
-    String getMonthOfDate();
+	List<Assignment> getAssignments();
+
+	void updateAssignments(List<Person> personList,
+			List<Assignment> assignmentList);
+
+	void setLocked(boolean locked) throws IllegalArgumentException;
+
+	String getMonthOfDate();
+
+	List<Connection> getConnections();
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import miro.client.db.MiroAccessDB;
 import miro.shared.Assignment;
+import miro.shared.OfficialInformation;
 import miro.shared.Person;
 import miro.shared.Project;
 import miro.shared.Record;
@@ -34,26 +35,29 @@ public class CenterPanel extends Composite implements EventListener {
 		@Source("style.css")
 		CssResource css();
 	}
-	//
+
 	interface CenterPanelUiBinder extends UiBinder<ScrollPanel, CenterPanel> {
 	}
 
 	private static CenterPanelUiBinder ourUiBinder = GWT
 			.create(CenterPanelUiBinder.class);
 
-	private MonthRow monthRow = new MonthRow(MiroState.CURRENT_YEAR);
-	private TitleRow[] titlesRowArray = new TitleRow[5];
-	private CalcRow[] calcRowArray = new CalcRow[8];
-	private List<ProjectRow> projectRowList = new ArrayList<ProjectRow>();
+	private MonthRow monthRow = new MonthRow(OfficialInformation.CURRENT_YEAR);
 	private CalcRow calcRowForProjectView = new CalcRow("Total prestations",
 			false);
+
+	private TitleRow[] titlesRowArray = new TitleRow[5];
+	private CalcRow[] calcRowArray = new CalcRow[8];
+
+	private List<ProjectRow> projectRowList = new ArrayList<ProjectRow>();
+
 	private static List<EventListener> eventListenerList = new ArrayList<EventListener>();
 	/*
 	 * Permet l'insertion de projets au bon endroit dans le tableau
 	 */
 	private int indexDeparture;
 	private int currentMonth;
-	
+
 	@UiField
 	FlexTable personArray;
 
@@ -62,7 +66,6 @@ public class CenterPanel extends Composite implements EventListener {
 				.ensureInjected();
 		initWidget(ourUiBinder.createAndBindUi(this));
 
-
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -70,22 +73,20 @@ public class CenterPanel extends Composite implements EventListener {
 
 			@Override
 			public void onSuccess(String result) {
-				currentMonth = Integer.parseInt(result) + 2;
+				currentMonth = Integer.parseInt(result);
 				refreshCenterPanel();
 			}
 		};
 		MiroAccessDB.getMonthOfDate(callback);
-
 		TopPanel.addEventListener(this);
 		BottomPanel.addEventListener(this);
 	}
 
 	public static void addEventListener(EventListener eventListener) {
-		
 		eventListenerList.add(eventListener);
 	}
 
-	public void refreshCenterPanel() { 
+	public void refreshCenterPanel() {
 		if (PartagedDataBetweenPanel.hasChangedView) {
 			PartagedDataBetweenPanel.hasChangedView = false;
 
@@ -99,7 +100,7 @@ public class CenterPanel extends Composite implements EventListener {
 				initCalcRowList();
 				refreshProjectRowList();
 				refreshCalcRowList();
-				refreshStyleNameOfTotalPourcentRow();
+				refreshStyleOfTotalPourcentRow();
 				break;
 
 			case PROJECT_VIEW:
@@ -114,7 +115,7 @@ public class CenterPanel extends Composite implements EventListener {
 				refreshTitleRowList();
 				refreshProjectRowList();
 				refreshCalcRowList();
-				refreshStyleNameOfTotalPourcentRow();
+				refreshStyleOfTotalPourcentRow();
 				break;
 			case PROJECT_VIEW:
 				refreshProjectRowList();
@@ -126,12 +127,23 @@ public class CenterPanel extends Composite implements EventListener {
 	}
 
 	private void disabledColumnsOfPreviousMonth() {
-		for (int i = 1; i < personArray.getRowCount(); i++) {
-			for (int j = 2; j < currentMonth; j++) {
-				try {
-					((TextBox) personArray.getWidget(i, j)).setReadOnly(true);
-				} catch (IndexOutOfBoundsException iobe) {
-				}
+		for (int i = 0; i < titlesRowArray.length; i++) {
+			for (int j = 2; j < currentMonth + 1; j++) {
+				((TextBox) (titlesRowArray[i].getElementAt(j)))
+						.setReadOnly(true);
+			}
+		}
+
+		for (int i = 0; i < projectRowList.size(); i++) {
+			for (int j = 2; j < currentMonth + 1; j++) {
+				((TextBox) (projectRowList.get(i).getElementAt(j)))
+						.setReadOnly(true);
+			}
+		}
+
+		for (int i = 0; i < calcRowArray.length; i++) {
+			for (int j = 2; j < currentMonth + 1; j++) {
+				((TextBox) (calcRowArray[i].getElementAt(j))).setReadOnly(true);
 			}
 		}
 	}
@@ -202,7 +214,7 @@ public class CenterPanel extends Composite implements EventListener {
 		calcRowForProjectView.setElementAt(1, sumOfRow);
 	}
 
-	private void refreshStyleNameOfTotalPourcentRow() {
+	private void refreshStyleOfTotalPourcentRow() {
 
 		for (int i = 1; i < calcRowArray[6].length(); i++) {
 
@@ -214,19 +226,13 @@ public class CenterPanel extends Composite implements EventListener {
 			double valueOfTextBox = Double.valueOf(txtNumberOfTextBox);
 
 			textBoxOfACell.removeStyleName("green");
-			textBoxOfACell.removeStyleName("orange");
 			textBoxOfACell.removeStyleName("red");
 
-			if (valueOfTextBox < 75) {
-				textBoxOfACell.addStyleName("green");
-			}
-
-			if (valueOfTextBox >= 75 && valueOfTextBox < 90) {
-				textBoxOfACell.addStyleName("orange");
-			}
-
-			if (valueOfTextBox > 90) {
+			if (valueOfTextBox > 100) {
 				textBoxOfACell.addStyleName("red");
+			}
+			else{
+				textBoxOfACell.addStyleName("green");
 			}
 		}
 	}
@@ -303,8 +309,8 @@ public class CenterPanel extends Composite implements EventListener {
 	}
 
 	private void initTitleRowList() {
-		Record[] recordOfNumberDaysByMonth = MiroState.numberDaysByMonthArray;
-		Record[] recordOfNumberOfficialHolidaysArray = MiroState.numberOfficialHolidaysArray;
+		Record[] recordOfNumberDaysByMonth = OfficialInformation.numberDaysByMonthArray;
+		Record[] recordOfNumberOfficialHolidaysArray = OfficialInformation.numberOfficialHolidaysArray;
 		titlesRowArray[0] = new TitleRow("Nombre Total de Jours", false);
 		titlesRowArray[1] = new TitleRow("Conges legaux & CIRB", false);
 		titlesRowArray[2] = new TitleRow("Conges et Absences", true);
@@ -347,7 +353,7 @@ public class CenterPanel extends Composite implements EventListener {
 		for (int i = 2; i < titlesRowArray.length; i++) {
 			for (int j = 2; j < titlesRowArray[i].length(); j++) {
 				Record record = new Record();
-				Time time = new Time(j - 1, MiroState.CURRENT_YEAR);
+				Time time = new Time(j - 1, OfficialInformation.CURRENT_YEAR);
 
 				if (PartagedDataBetweenPanel.currentPerson != null) {
 					switch (i) {
@@ -599,6 +605,11 @@ public class CenterPanel extends Composite implements EventListener {
 			break;
 		}
 		disabledColumnsOfPreviousMonth();
+		if (PartagedDataBetweenPanel.isReadOnly
+				|| PartagedDataBetweenPanel.isImporting || PartagedDataBetweenPanel.isSaving) {
+			disabledAllTitleRow();
+			disabledAllProjectRow();
+		}
 	}
 
 	private void addRowToArray(RowType rowType) {
@@ -668,7 +679,6 @@ public class CenterPanel extends Composite implements EventListener {
 
 	private void disabledAllProjectRow() {
 		for (int i = 0; i < projectRowList.size(); i++) {
-			((TextBox) projectRowList.get(i).getElementAt(0)).setEnabled(false);
 			for (int j = 1; j < projectRowList.get(i).length(); j++) {
 				((TextBox) projectRowList.get(i).getElementAt(j))
 						.setReadOnly(true);
@@ -686,11 +696,6 @@ public class CenterPanel extends Composite implements EventListener {
 	@Override
 	public void notifyChange(Widget widget) {
 		refreshCenterPanel();
-		
-		if(PartagedDataBetweenPanel.isImporting){
-			this.disabledAllTitleRow();
-			this.disabledAllProjectRow();
-		}
 	}
 
 	private void notifyListeners() {
@@ -724,14 +729,14 @@ public class CenterPanel extends Composite implements EventListener {
 					manageTitleRow();
 					refreshTitleRowList();
 					refreshCalcRowList();
-					refreshStyleNameOfTotalPourcentRow();
+					refreshStyleOfTotalPourcentRow();
 				}
 			}
 		}
 
 		private void manageTitleRow() {
 			int monthNumber = column - 1;
-			Time time = new Time(monthNumber, MiroState.CURRENT_YEAR);
+			Time time = new Time(monthNumber, OfficialInformation.CURRENT_YEAR);
 			switch (row) {
 
 			case 3:
@@ -780,7 +785,7 @@ public class CenterPanel extends Composite implements EventListener {
 		}
 
 		private void treatmentOfProject() {
-			Time time = new Time(columnNumber, MiroState.CURRENT_YEAR);
+			Time time = new Time(columnNumber, OfficialInformation.CURRENT_YEAR);
 			Record record = new Record(oldValue, time);
 			Assignment assignment = null;
 
@@ -795,7 +800,7 @@ public class CenterPanel extends Composite implements EventListener {
 				assignment.setPrestation(columnNumber - 1, record);
 
 				refreshCalcRowList();
-				refreshStyleNameOfTotalPourcentRow();
+				refreshStyleOfTotalPourcentRow();
 				break;
 			case PROJECT_VIEW:
 				int indexSpacing = titleOfRow.indexOf(" ");

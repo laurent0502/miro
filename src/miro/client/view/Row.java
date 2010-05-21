@@ -3,56 +3,59 @@ package miro.client.view;
 import com.google.gwt.user.client.ui.TextBox;
 
 public class Row {
-    private String title;
-    private final int SIZE_OF_ARRAY = 14;
-    protected TextBox[] arrayForARow;
+	private String title;
+	private final int SIZE_OF_ARRAY = 14;
+	protected TextBox[] arrayForARow;
 
-    public Row() {
-        arrayForARow = new TextBox[SIZE_OF_ARRAY];
-        title = "";
+	public Row() {
+		arrayForARow = new TextBox[SIZE_OF_ARRAY];
+		title = "";
 
-        initArray();
-    }
+		initArray();
+	}
 
-    public Row(String titleOfRow) {
-        arrayForARow = new TextBox[SIZE_OF_ARRAY];
-        title = titleOfRow;
+	public Row(String titleOfRow) {
+		arrayForARow = new TextBox[SIZE_OF_ARRAY];
+		title = titleOfRow;
 
-        initArray();
-    }
+		initArray();
+	}
 
-    private void initArray() {
+	private void initArray() {
 
-        for (int i = 0; i < arrayForARow.length; i++) {
-            arrayForARow[i] = new TextBox();
-        }
-        arrayForARow[0].setText(title);
-    }
+		for (int i = 0; i < arrayForARow.length; i++) {
+			arrayForARow[i] = new TextBox();
+		}
 
-    public Object getElementAt(int column) {
-        if (column < 0 || column >= arrayForARow.length) return "";
+		arrayForARow[0].setText(title);
+	}
 
-        return arrayForARow[column];
-    }
+	public Object getElementAt(int column) {
+		if (column < 0 || column >= arrayForARow.length)
+			return null;
 
-    public boolean setElementAt(int index,String value){
-        boolean isModified = index > 0 && index < arrayForARow.length;
+		return arrayForARow[column];
+	}
 
-        if(isModified) arrayForARow[index].setText(value);
+	public boolean setElementAt(int index, String value) {
+		boolean isModified = index > 0 && index < arrayForARow.length;
 
-        return isModified;
-    }
+		if (isModified)
+			arrayForARow[index].setText(value);
 
-    public int length() {
-        return arrayForARow.length;
-    }
+		return isModified;
+	}
 
-    public void setTitle(String title){
-        this.title = title;
-        arrayForARow[0].setText(title);
-    }
+	public int length() {
+		return arrayForARow.length;
+	}
 
-    public String getTitle(){
-        return title;
-    }
+	public void setTitle(String title) {
+		this.title = title;
+		arrayForARow[0].setText(title);
+	}
+
+	public String getTitle() {
+		return title;
+	}
 }

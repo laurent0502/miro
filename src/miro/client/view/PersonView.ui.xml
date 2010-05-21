@@ -1,21 +1,23 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-             xmlns:g='urn:import:com.google.gwt.user.client.ui'
-             xmlns:miroView='urn:import:miro.client.view'>
+	xmlns:g='urn:import:com.google.gwt.user.client.ui' xmlns:miroView='urn:import:miro.client.view'>
 
-	<!-- unit indique les unités utilisées pour exprimer une taille-->
-    <g:DockLayoutPanel unit='EM' ui:field="dockPanel">
+	<!--
+		unit indique les unités utilisées pour exprimer la taille des
+		composants que contient le DockLayout
+	-->
+	<g:DockLayoutPanel unit='EM'>
 
-        <g:north size="5">
-            <miroView:TopPanel ui:field="topPanel"/>
-        </g:north>
+		<g:north size="5">
+			<miroView:TopPanel/>
+		</g:north>
 
-        <g:center>
-            <miroView:CenterPanel ui:field="centerPanel"/>
-        </g:center>
+		<g:center>
+			<miroView:CenterPanel />
+		</g:center>
 
-        <g:south size="2">
-        	<miroView:BottomPanel ui:field="bottomPanel"/>
-        </g:south>
+		<g:south size="2">
+			<miroView:BottomPanel />
+		</g:south>
 
-    </g:DockLayoutPanel>
+	</g:DockLayoutPanel>
 </ui:UiBinder>

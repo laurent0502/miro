@@ -1,14 +1,23 @@
 package miro.shared;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.List;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * The async counterpart of <code>GreetingService</code>.
  */
 public interface GreetingServiceAsync {
-    void getAssignments(AsyncCallback<List<Assignment>> callback);
-    void updateAssignments(List<Person> personList,List<Assignment> assignmentList,AsyncCallback<String> callback);
-    void setLocked(boolean locked,AsyncCallback callback)throws IllegalArgumentException,NullPointerException;
-    void getMonthOfDate(AsyncCallback<String> callback);
+
+	void getAssignments(AsyncCallback<List<Assignment>> callback);
+
+	void updateAssignments(List<Person> personList,
+			List<Assignment> assignmentList, AsyncCallback callback);
+
+	void setLocked(boolean locked, AsyncCallback callback)
+			throws IllegalArgumentException;
+
+	void getMonthOfDate(AsyncCallback<String> callback);
+
+	void getConnections(AsyncCallback/*<List<Connection>>*/ callback);
 }

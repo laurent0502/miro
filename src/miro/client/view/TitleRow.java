@@ -1,60 +1,65 @@
 package miro.client.view;
+
 import com.google.gwt.i18n.client.NumberFormat;
 
 public class TitleRow extends Row {
-    private final NumberFormat NUMBER_FORMAT_FOR_TITLEROW = NumberFormat.getFormat("00.00");
-    private boolean isEnabledAllCells;
 
-    public TitleRow(String titleOfRow, boolean isEnabled) {
-        super(titleOfRow);
+	private final NumberFormat NUMBER_FORMAT_FOR_TITLEROW = NumberFormat
+			.getFormat("0.##");
+	private boolean isEnabledAllCells;
 
-        initArray();
-        disabledFirstCells();
+	public TitleRow(String titleOfRow, boolean isEnabled) {
+		super(titleOfRow);
 
-        isEnabledAllCells = isEnabled;
+		initArray();
+		disabledFirstCells();
 
-        if (!isEnabledAllCells) disabledAllCells();
-    }
+		isEnabledAllCells = isEnabled;
 
-    private void disabledFirstCells() {
-        arrayForARow[0].setEnabled(false);
+		if (!isEnabledAllCells)
+			disabledAllCells();
+	}
 
-        arrayForARow[1].setReadOnly(true);
-    }
+	private void disabledFirstCells() {
+		arrayForARow[0].setEnabled(false);
 
-    private void disabledAllCells() {
-        for (int i = 1; i < arrayForARow.length; i++) {
-            arrayForARow[i].setReadOnly(true);
-        }
-    }
+		arrayForARow[1].setReadOnly(true);
+	}
 
-    private void initArray() {
+	private void disabledAllCells() {
+		for (int i = 1; i < arrayForARow.length; i++) {
+			arrayForARow[i].setReadOnly(true);
+		}
+	}
 
-        for (int i = 1; i < arrayForARow.length; i++) {
-            setElementAt(i, 0);
-        }
-    }
+	private void initArray() {
 
-    public boolean setElementAt(int index, double value) {
-        boolean isModified = index > 0 && index < arrayForARow.length && value >= 0;
-        String stringFormatted = NUMBER_FORMAT_FOR_TITLEROW.format(value);
+		for (int i = 1; i < arrayForARow.length; i++) {
+			setElementAt(i, 0);
+		}
+	}
 
-        if (isModified) {
-            arrayForARow[index].setText(stringFormatted);
-        }
-        return isModified;
-    }
+	public boolean setElementAt(int index, double value) {
+		boolean isModified = index > 0 && index < arrayForARow.length
+				&& value >= 0;
+		String stringFormatted = NUMBER_FORMAT_FOR_TITLEROW.format(value);
 
-    public double sumRow() {
-        double sumOfRow = 0;
+		if (isModified) {
+			arrayForARow[index].setText(stringFormatted);
+		}
+		return isModified;
+	}
 
-        for (int i = 2; i < arrayForARow.length; i++) {
-            String txtNumberOfACell = arrayForARow[i].getText();
-            double numberOfACell = Double.valueOf(txtNumberOfACell);
-            sumOfRow += numberOfACell;
-        }
-        String stringFormatted = NUMBER_FORMAT_FOR_TITLEROW.format(sumOfRow);
+	public double sumRow() {
+		double sumOfRow = 0;
 
-        return Double.valueOf(stringFormatted);
-    }
+		for (int i = 2; i < arrayForARow.length; i++) {
+			String txtNumberOfACell = arrayForARow[i].getText();
+			double numberOfACell = Double.valueOf(txtNumberOfACell);
+			sumOfRow += numberOfACell;
+		}
+		String stringFormatted = NUMBER_FORMAT_FOR_TITLEROW.format(sumOfRow);
+
+		return Double.valueOf(stringFormatted);
+	}
 }

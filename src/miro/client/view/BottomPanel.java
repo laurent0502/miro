@@ -18,10 +18,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
 
-public class BottomPanel extends Composite {
+public class BottomPanel extends Composite implements EventListener {
 
-	//
 	private static BottomPanelUiBinder uiBinder = GWT
 			.create(BottomPanelUiBinder.class);
 
@@ -36,37 +36,44 @@ public class BottomPanel extends Composite {
 
 	@UiField
 	Button lockButton;
-	
+
 	private static List<EventListener> listenersList = new ArrayList<EventListener>();
 
-	private final AsyncCallback<List<Assignment>> CALLBACK2 = new AsyncCallback<List<Assignment>>() {
+	private final AsyncCallback<List<Assignment>> GET_ASSIGNMENT_CALLBACK = new AsyncCallback<List<Assignment>>() {
 
 		@Override
 		public void onFailure(Throwable caught) {
+			Window.alert("Impossible d'obtenir les informations !");
+			
+			PartagedDataBetweenPanel.isLocked = true;
+			PartagedDataBetweenPanel.isSaving = false;
 		}
 
 		@Override
 		public void onSuccess(List<Assignment> result) {
-
+			Window.alert("Les donnees ont ete sauvegardes avec succes ! ");
+			
+			PartagedDataBetweenPanel.isLocked = false;
+			PartagedDataBetweenPanel.isSaving = false;
+			
 			lockButton.setEnabled(true);
 			saveButton.setEnabled(false);
-			
+
 			MiroState.updateViewState(result);
-			Window.alert("message");
-			BottomPanel.this.notifyListeners();
+			notifyListeners();
 		}
 	};
-	
-	private final AsyncCallback CALLBACK = new AsyncCallback() {
+
+	private final AsyncCallback UPDATE_ASSIGNMENT_CALLBACK = new AsyncCallback() {
 
 		@Override
 		public void onFailure(Throwable caught) {
-			Window.alert(caught.getMessage());
+			Window.alert("Impossible de sauver les informations !");
 		}
 
 		@Override
 		public void onSuccess(Object result) {
-			MiroAccessDB.getAssignments(CALLBACK2);
+			MiroAccessDB.getAssignments(GET_ASSIGNMENT_CALLBACK);
 		}
 	};
 
@@ -74,55 +81,68 @@ public class BottomPanel extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		initAbsolutePanel();
 		initWindowCloseListener();
+
+		TopPanel.addEventListener(this);
 	}
 
-	public static void addEventListener(EventListener eventListener){
+	public static void addEventListener(EventListener eventListener) {
 		listenersList.add(eventListener);
 	}
-	
-	private void notifyListeners(){
-		for(EventListener eventListener : listenersList){
-			Window.alert("passe dedans");
+
+	private void ajustButtons() {
+		if (PartagedDataBetweenPanel.isReadOnly) {
+			lockButton.setVisible(false);
+			saveButton.setVisible(false);
+		}
+	}
+
+	private void notifyListeners() {
+		for (EventListener eventListener : listenersList) {
 			eventListener.notifyChange(this);
 		}
 	}
-	
+
 	@UiHandler("saveButton")
 	void onClick(ClickEvent e) {
-		
-		MiroAccessDB.updateAssignments(MiroState.getPersonList(),
-				MiroState.getAssignmentList(), CALLBACK);
+		//PartagedDataBetweenPanel.isLocked = false;
+		PartagedDataBetweenPanel.isSaving = true;
+		notifyListeners();
+		MiroAccessDB.updateAssignments(MiroState.getPersonList(), MiroState
+				.getAssignmentList(), UPDATE_ASSIGNMENT_CALLBACK);
 	}
 
 	@UiHandler("lockButton")
 	void onClick1(ClickEvent e) {
 
-		AsyncCallback callback = new AsyncCallback() {
+		final AsyncCallback SET_LOCKED_CALLBACK = new AsyncCallback() {
 
 			@Override
 			public void onFailure(Throwable caught) {
+				PartagedDataBetweenPanel.isLocked = false;
 				Window.alert(caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(Object result) {
+				PartagedDataBetweenPanel.isLocked = true;
 				lockButton.setEnabled(false);
 				saveButton.setEnabled(true);
-				BottomPanel.this.notifyListeners();
-				//BottomPanel.this.fireEvent(new LockedEvent());
+				notifyListeners();
 			}
 		};
-		MiroAccessDB.setLocked(true, callback);
+		MiroAccessDB.setLocked(true, SET_LOCKED_CALLBACK);
 	}
 
 	private void initAbsolutePanel() {
 		absolutePanel.setSize("900px", "50px");
 		absolutePanel.setWidgetPosition(lockButton, 25, 0);
 		absolutePanel.setWidgetPosition(saveButton, 90, 0);
+
+		ajustButtons();
 	}
 
 	private void initWindowCloseListener() {
-		final AsyncCallback callback = new AsyncCallback() {
+		final AsyncCallback CLOSING_WINDOWS_CALLBACK = new AsyncCallback() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -138,13 +158,20 @@ public class BottomPanel extends Composite {
 			@Override
 			public void onWindowClosing(ClosingEvent event) {
 				/*
-				 * Si lorsqu'on ferme l'application,le lock est actif,il faut le
+				 * Si le lock est actif lorsqu'on ferme l'application,il faut le
 				 * rendre inactif
 				 */
 				if (!lockButton.isEnabled()) {
-					MiroAccessDB.setLocked(false, callback);
+					MiroAccessDB.setLocked(false, CLOSING_WINDOWS_CALLBACK);
 				}
 			}
 		});
+	}
+
+	@Override
+	public void notifyChange(Widget widget) {
+
+		if (!lockButton.isEnabled() && !PartagedDataBetweenPanel.isReadOnly)
+			saveButton.setEnabled(!PartagedDataBetweenPanel.isImporting);
 	}
 }

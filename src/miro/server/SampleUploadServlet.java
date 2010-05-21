@@ -11,51 +11,77 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import miro.shared.Assignment;
+import miro.shared.OfficialInformation;
 import miro.shared.Person;
 import miro.shared.Project;
+import miro.shared.Record;
 import miro.shared.Time;
+
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.log4j.Logger;
-//
+
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.ObjectifyService;
+
 public class SampleUploadServlet extends HttpServlet {
 	private Time time;
 	private List<Person> personList = new ArrayList<Person>();
 	private List<Assignment> assignmentList;
 	private GreetingServiceImpl greetingService = new GreetingServiceImpl();
-	private Logger logger = Logger.getLogger(this.getClass());
 
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException{
+	/**
+	 * Methode appelee lorsque l'utilisateur soumet un fichier au serveur
+	 * 
+	 * @param request
+	 *            Requete demandee
+	 * @param response
+	 *            Reponse de la requete
+	 * @throws ServletException
+	 *             Si les informations contenues dans le fichier ne concerne pas
+	 *             un mois precedent de l'annee courante
+	 **/
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException {
+
 		assignmentList = greetingService.getAssignments();
 		/*
-		 * récupération dans assignmentList des personnes afin de les mettre
-		 * dans personList
+		 * recuperation dans assignmentList des personnes afin de les mettre
+		 * dans l'attribut global personList
 		 */
 		setPersonList();
-
+		ServletFileUpload upload = new ServletFileUpload();
 		try {
-			ServletFileUpload upload = new ServletFileUpload();
+
 			FileItemIterator it = upload.getItemIterator(request);
 
 			while (it.hasNext()) {
 				FileItemStream item = it.next();
 
-				parseFile(item);
-				logger.error("parseFile end");
-				modifyDB();
+				parseFile(item);// list = new AssignmentParser(file).parse(item)
+
+				for (Assignment assignment : assignmentList) {
+					Objectify ofy = ObjectifyService.beginTransaction();
+					ofy.put(assignment);
+					ofy.getTxn().commit();
+				}
 			}
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
-		} 
-		catch (FileUploadException e) {
+		} catch (FileUploadException e) {
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * Decode la premiere ligne du fichier
+	 * 
+	 * @param line
+	 *            Premiere ligne du fichier
+	 **/
 	private void decodeFirstLineOfFile(String line) {
 		List<String> itemList = getItemsOfLine(line);
 		String lastAndFirstName = itemList.get(0);
@@ -68,11 +94,19 @@ public class SampleUploadServlet extends HttpServlet {
 
 		addPerson(lastAndFirstName);
 		setTime(year, month);
-		logger.error("decodefirstlineoffile");
+
 		manageLastItems(getPerson(lastAndFirstName), missionType, missionName,
 				activityName, prestationForMonth);
 	}
 
+	/**
+	 * Permet de retrouver la personne avec ses informations d'apres son nom et
+	 * son prenom
+	 * 
+	 * @param lastAndFirstName
+	 *            Nom et prenom de la personne
+	 * @return La personne
+	 **/
 	private Person getPerson(String lastAndFirstName) {
 		int indexSpacing = lastAndFirstName.indexOf(" ");
 		String lastName = lastAndFirstName.substring(0, indexSpacing);
@@ -86,6 +120,13 @@ public class SampleUploadServlet extends HttpServlet {
 		return personList.get(indexOfPerson);
 	}
 
+	/**
+	 * Permet d'ajouter une personne e la liste des personnes
+	 * 
+	 * @param lastAndFirstName
+	 *            Nom et prenom de la personne
+	 * @return true si la personne a pu etre ajoutee
+	 **/
 	private boolean addPerson(String lastAndFirstName) {
 		int indexSpacing = lastAndFirstName.indexOf(" ");
 		String lastName = lastAndFirstName.substring(0, indexSpacing);
@@ -99,6 +140,12 @@ public class SampleUploadServlet extends HttpServlet {
 		return isAdded;
 	}
 
+	/**
+	 * Permet de decoder une ligne du fichier
+	 * 
+	 * @param line
+	 *            Ligne du fichier
+	 **/
 	private void decodeLine(String line) {
 		List<String> itemList = getItemsOfLine(line);
 		String lastAndFirstName = itemList.get(0);
@@ -112,10 +159,20 @@ public class SampleUploadServlet extends HttpServlet {
 				activityName, prestationForMonth);
 	}
 
-	private void parseFile(FileItemStream item) throws ServletException {
-		
+	/**
+	 * Permet de parcourir le fichier
+	 * 
+	 * @param item
+	 *            Objet qui represente le fichier e parcourir
+	 * @throws ServletException
+	 *             Si les informations contenues dans le fichier ne concerne pas
+	 *             un mois precedent de l'annee courante
+	 **/
+	private void parseFile(FileItemStream item) throws ServletException,
+			IOException {
+		InputStream stream = item.openStream();
 		try {
-			InputStream stream = item.openStream();
+
 			InputStreamReader inputStreamReader = new InputStreamReader(stream);
 			BufferedReader bufferedReader = new BufferedReader(
 					inputStreamReader);
@@ -125,18 +182,25 @@ public class SampleUploadServlet extends HttpServlet {
 
 			decodeFirstLineOfFile(line);
 
+			// Si la periode des informations du fichier est incorrect,une
+			// exception est lancee
 			if (!isPeriodOfFileCorrect()) {
-				logger.error("periode invalide");
 				throw new ServletException("Periode du fichier invalide !!!");
 			}
 			while ((line = bufferedReader.readLine()).charAt(0) != ';') {
 				decodeLine(line);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		} finally {
+			stream.close();
 		}
 	}
 
+	/**
+	 * Indique si les informations contenues dans le fichier concerne bien un
+	 * mois precedent de l'annee courante
+	 * 
+	 * @return true si il s'agit d'informations antecedentes
+	 **/
 	private boolean isPeriodOfFileCorrect() {
 		String month = greetingService.getMonthOfDate();
 		String year = greetingService.getYearOfDate();
@@ -145,6 +209,13 @@ public class SampleUploadServlet extends HttpServlet {
 				&& time.getYear() == Integer.parseInt(year);
 	}
 
+	/**
+	 * Decortique une ligne du fichier afin de mettre le resultat dans une liste
+	 * 
+	 * @param line
+	 *            Ligne du fichier
+	 * @return La liste
+	 **/
 	private List<String> getItemsOfLine(String line) {
 		List<String> itemList = new ArrayList<String>();
 
@@ -161,9 +232,17 @@ public class SampleUploadServlet extends HttpServlet {
 		return itemList;
 	}
 
-	private void setTime(String item, String item2) {
-		int year = Integer.parseInt(item);
-		int month = Integer.parseInt(item2);
+	/**
+	 * Modifie l'attribut Time contenu en global
+	 * 
+	 * @param yearTxt
+	 *            Represente l'annee
+	 * @param monthTxt
+	 *            Repesente le mois
+	 **/
+	private void setTime(String yearTxt, String monthTxt) {
+		int year = Integer.parseInt(yearTxt);
+		int month = Integer.parseInt(monthTxt);
 
 		time = new Time(month, year);
 	}
@@ -172,13 +251,19 @@ public class SampleUploadServlet extends HttpServlet {
 			String item3, String item4) {
 		item3 = item3.toLowerCase();
 		item1 = item1.replace(item1.charAt(1), 'e');
+		item1 = item1.replace(item1.charAt(3), 'e');
+		item1 = item1.toLowerCase();
+
+		item4 = item4.replace(",", ".");
 
 		double valueOfPrestation = Double.valueOf(item4);
 
-		if (item1.equals("Generique")) {
-			logger.error("passe bien ici");
+		if (item1.equals("generique")) {
 			if (item3.equals("absence")) {
-				person.getHoliday(time).setNumber(valueOfPrestation);
+				Record record = OfficialInformation.numberOfficialHolidaysArray[time
+						.getMonth() - 1];
+				person.getHoliday(time).setNumber(
+						valueOfPrestation - record.getNumber());
 			}
 			if (item3.equals("formations")) {
 				person.getTraining(time).setNumber(valueOfPrestation);
@@ -203,29 +288,11 @@ public class SampleUploadServlet extends HttpServlet {
 		}
 	}
 
-	private void modifyDB() {
-		GreetingServiceImpl greetingService = new GreetingServiceImpl();
-
-		greetingService.putData(assignmentList);
-	}
-
-	private void addAssignmentsForPersonWithoutProject() {
-
-		for (Person person : personList) {
-			boolean hasAssignmentForPerson = false;
-
-			for (Assignment assignment : assignmentList) {
-				if (assignment.getPerson().equals(person)) {
-					hasAssignmentForPerson = true;
-				}
-			}
-			if (!hasAssignmentForPerson) {
-				assignmentList.add(new Assignment(null, person));
-			}
-		}
-	}
-
+	/**
+	 * Modifie la liste des personnes en se basant sur la liste des assignements
+	 **/
 	private void setPersonList() {
+		personList.clear();
 		for (Assignment assignment : assignmentList) {
 			Person person = assignment.getPerson();
 

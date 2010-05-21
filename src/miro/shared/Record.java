@@ -1,50 +1,96 @@
 package miro.shared;
 
 import java.io.Serializable;
+
 import javax.persistence.Embedded;
 
+/**
+ * Cette classe repr�sente une prestation
+ **/
 public class Record implements Serializable {
-    private double number;
-    @Embedded
-    private Time time;
 
-    public Record() {
-        number = 0;
-        time = new Time();
-    }
+	private double number;
 
-    public Record(double number, Time time) {
-        this.number = number;
-        this.time = time;
-    }
+	@Embedded
+	private Time time;
 
-    public boolean setNumber(double number) {
-        boolean isModified = (number >= 0);
+	/**
+	 * Construit un Record
+	 **/
+	public Record() {
+		number = 0;
+		time = new Time();
+	}
 
-        if (isModified) this.number = number;
+	/**
+	 * Construit un Record
+	 * 
+	 * @param number
+	 *            Valeur de la prestation
+	 * @param time
+	 *            P�riode de la prestation
+	 **/
+	public Record(double number, Time time) {
+		this.number = number;
+		this.time = time;
+	}
 
-        return isModified;
-    }
+	/**
+	 * Modifie la valeur du Record
+	 * 
+	 * @param number
+	 *            Nouvelle valeur du Record
+	 * @return true si la modification a pu �tre effectu�e
+	 **/
+	public boolean setNumber(double number) {
+		boolean isModified = (number >= 0);
 
-    public double getNumber() {
-        return number;
-    }
+		if (isModified)
+			this.number = number;
 
-    public Time getTime() {
-        return time;
-    }
+		return isModified;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+	/**
+	 * Permet d'obtenir la valeur du Record
+	 * 
+	 * @return La valeur
+	 **/
+	public double getNumber() {
+		return number;
+	}
 
-        Record record = (Record) o;
+	/**
+	 * Permet d'obtenir la p�riode du Record
+	 * 
+	 * @return La p�riode
+	 **/
+	public Time getTime() {
+		return time;
+	}
 
-        if (number != record.number) return false;
+	/**
+	 * Compare par �galit� deux Record
+	 * 
+	 * @param o
+	 *            Objet � qui repr�sente un Record
+	 * @return true si les deux �l�ments sont �gaux
+	 **/
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 
-        if (time != null ? !time.equals(record.time) : record.time != null) return false;
+		Record record = (Record) o;
 
-        return true;
-    }
+		if (number != record.number)
+			return false;
+
+		if (time != null ? !time.equals(record.time) : record.time != null)
+			return false;
+
+		return true;
+	}
 }
