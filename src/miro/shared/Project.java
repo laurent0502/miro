@@ -2,76 +2,86 @@ package miro.shared;
 
 import java.io.Serializable;
 
-public class Project implements Serializable,Comparable {
+/**
+ * Cette classe représente un projet du département Projet
+ **/
+public class Project implements Serializable, Comparable {
 
-    private String name;
+	private String name;
 
-    public Project() {
-    }
-
-    public Project(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
+	/**
+	 * Construit un Project par défaut
+	 **/
+	public Project() {
+		name = "";
 	}
-/*
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+
+	/**
+	 * Construit un Project
+	 * 
+	 * @param name
+	 *            Nom du projet
+	 **/
+	public Project(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * Permet d'obtenir le nom du projet
+	 * 
+	 * @return Le nom
+	 **/
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Compare par égalité deux Project
+	 * 
+	 * @param o
+	 *            Objet à comparer et censé représenter un Projet
+	 * @return true si les deux éléments sont égaux
+	 **/
+	public boolean equals(Object o) {
+		boolean isEquals = false;
+
+		if (o != null && this == null)
+			return false;
+		if (o == null && this != null)
+			return false;
+
+		if (o == null && this == null)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Project other = (Project) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
-	}*/
 
-    public boolean equals(Object o) {
-        boolean isEquals = false;
-        
-        if( o != null && this == null ) return false;
-        if( o == null && this != null ) return false;
-        
-        if( o == null && this == null ) return true;
-        //isEquals = ( this != null && o != null ) || (this == null && this == null);
-        //isEquals = isEquals && ( getClass() == o.getClass() );
-        
-        if (o instanceof Project) {
-            Project project = (Project) o;
+		if (o instanceof Project) {
+			Project project = (Project) o;
 
-            isEquals = project.name.equals(name);
-        }
-        return isEquals;
-    }
-    
-    @Override
+			isEquals = project.name.equals(name);
+		}
+		return isEquals;
+	}
+
+	/**
+	 * Compare le nom de deux projets
+	 * 
+	 * @param arg0
+	 *            Objet censé représenter le projet à comparer
+	 * @return 1 si le nom du projet courant est plus grand que l'autre
+	 * @return 0 si le nom des deux projets sont égaux
+	 * @return -1 si le nom du projet courant est plus petit que l'autre
+	 **/
+	@Override
 	public int compareTo(Object arg0) {
-		
-		if( arg0 instanceof Project){
-			Project project = (Project)arg0;
+
+		if (arg0 instanceof Project) {
+			Project project = (Project) arg0;
 			int compare = name.compareTo(project.name);
-			
-			if( compare > 0)
+
+			if (compare > 0)
 				return 1;
-			if( compare < 0 )
+			if (compare < 0)
 				return -1;
-			
+
 			return 0;
 		}
 		return 1;

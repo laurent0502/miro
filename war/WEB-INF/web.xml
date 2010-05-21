@@ -4,15 +4,10 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-
-	<!-- Servlets -->
-	<!-- greetServlet -->
 	<servlet>
 		<servlet-name>greetServlet</servlet-name>
 		<servlet-class>miro.server.GreetingServiceImpl</servlet-class>
 	</servlet>
-	<!-- greetServlet -->
-	<!-- /mirov2/greet -->
 
 	<servlet-mapping>
 		<servlet-name>greetServlet</servlet-name>

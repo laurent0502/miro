@@ -1,14 +1,13 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
 	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
-<!---->
+
 	<g:AbsolutePanel ui:field="absolutePanel">
 		<g:Label text="Choix de la personne :" ui:field="labPersonOrProjectChoice" />
 		<g:ListBox ui:field="personOrProjectChoiceList" />
 		<g:Label text="Affecter un projet :" ui:field="labPersonOrProjectAffectChoice" />
 		<g:ListBox ui:field="personOrProjectAffectChoiceList" />
 		<g:Label text="Importer un fichier :" ui:field="labImportFile" />
-		<g:FormPanel ui:field="formPanel">
-		</g:FormPanel>
+		<g:FormPanel ui:field="formPanel" />
 	</g:AbsolutePanel>
 
 </ui:UiBinder>

@@ -2,32 +2,21 @@ package miro.client.view;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 
+public class PersonView extends Composite {
 
-public class PersonView {
 	interface PersonViewUiBinder extends UiBinder<DockLayoutPanel, PersonView> {
-    }
-	//
-    static PersonViewUiBinder ourUiBinder = GWT.create(PersonViewUiBinder.class);
+	}
 
-    //TabLayoutPanel rootElement = ourUiBinder.createAndBindUi(this);
-    DockLayoutPanel rootElement = ourUiBinder.createAndBindUi(this);
+	static PersonViewUiBinder ourUiBinder = GWT
+			.create(PersonViewUiBinder.class);
 
-    @UiField
-    TopPanel topPanel;
-    @UiField
-    CenterPanel centerPanel;
-    @UiField
-    BottomPanel bottomPanel;
+	DockLayoutPanel rootElement = ourUiBinder.createAndBindUi(this);
 
-    @UiField
-    DockLayoutPanel dockPanel;
-    
-    public PersonView(){
-        RootLayoutPanel root = RootLayoutPanel.get();
-        root.add(rootElement);
-    }
+	public PersonView() {
+		RootLayoutPanel.get().add(rootElement);
+	}
 }

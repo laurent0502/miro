@@ -38,44 +38,54 @@ public class TopPanel extends Composite implements EventListener {
 
 	@UiField
 	Label labPersonOrProjectChoice;
+
 	@UiField
 	Label labPersonOrProjectAffectChoice;
+
 	@UiField
 	Label labImportFile;
+
 	@UiField
 	ListBox personOrProjectChoiceList;
+
 	@UiField
 	ListBox personOrProjectAffectChoiceList;
+
 	@UiField
 	FormPanel formPanel;
+
 	@UiField
 	AbsolutePanel absolutePanel;
 
 	private final int MARGIN_TOP_OF_COMPONENTS = 15;
+
 	private List<Person> personList;
 	private List<Project> projectList;
 	private List<Project> projectNotAssignedForPerson;
 	private List<Person> personNotAssignedForProject;
+
+	private Button submitButton = new Button("SUBMIT");
+
 	private static List<EventListener> eventListenerList = new ArrayList<EventListener>();
-	private Button submitButton;
 
 	public TopPanel() {
+		boolean isReadOnly = PartagedDataBetweenPanel.isReadOnly;
 		initWidget(ourUiBinder.createAndBindUi(this));
 		initAbsolutePanel();
 		initTopPanel();
-		ClickHandler handler = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				submitButton.setEnabled(true);
-				Window.alert("on click");
-			}
-		};
-		//
-		addHandler(handler, LockedEvent.getType());
 
+		labPersonOrProjectAffectChoice.setVisible(!isReadOnly);
+		labImportFile.setVisible(!isReadOnly);
+		personOrProjectAffectChoiceList.setVisible(!isReadOnly);
+		formPanel.setVisible(!isReadOnly);
 		// TODO REMOVE
 		CenterPanel.addEventListener(this);
 		BottomPanel.addEventListener(this);
+	}
+
+	private void ajustList() {
+		personOrProjectAffectChoiceList
+				.setEnabled(!PartagedDataBetweenPanel.isReadOnly);
 	}
 
 	private void initTopPanel() {
@@ -121,90 +131,23 @@ public class TopPanel extends Composite implements EventListener {
 		absolutePanel.setWidgetPosition(formPanel, 1000,
 				MARGIN_TOP_OF_COMPONENTS);
 
+		FileUpload fileUpload = new FileUpload();
+		fileUpload.setName("uploadFormElement");
+
+		submitButton.setEnabled(false);
+
+		HorizontalPanel horizontalPanel = new HorizontalPanel();
+		horizontalPanel.add(fileUpload);
+		horizontalPanel.add(submitButton);
+
 		formPanel.setAction(GWT.getModuleBaseURL() + "SampleUploadServlet");
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
-
-		HorizontalPanel panel = new HorizontalPanel();
-		FileUpload upload = new FileUpload();
-		upload.setName("uploadFormElement");
-		panel.add(upload);
-
-		formPanel.setWidget(panel);
-
-		submitButton = new Button("Submit", new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				PartagedDataBetweenPanel.isImporting = true;
-				/*
-				 * Callback utilisé lors de l'appel au serveur afin de sauver
-				 * les données avant de soumettre le formulaire au servlet en
-				 * cas de succès
-				 */
-				/*AsyncCallback callback = new AsyncCallback() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-					}
-
-					@Override
-					public void onSuccess(Object result) {
-						formPanel.submit();
-					}
-				};
-				MiroAccessDB.updateAssignments(personList, MiroState
-						.getAssignmentList(), callback);
-				 */
-				disabledTopPanel();
-				formPanel.submit();
-				notifyListeners();
-			}
-		});
-		panel.add(submitButton);
-
-		formPanel.addSubmitCompleteHandler(new SubmitCompleteHandler() {
-
-			@Override
-			public void onSubmitComplete(SubmitCompleteEvent event) {
-
-				if (isResponseServerOk(event.getResults())) {
-					final AsyncCallback<List<Assignment>> callback = new AsyncCallback<List<Assignment>>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-						}
-
-						@Override
-						public void onSuccess(List<Assignment> result) {
-							MiroState.updateViewState(result);
-							refreshPersonOrProjectChoiceList();
-							setSelectedItemFromPersonOrProjectChoiceList();
-							refreshPersonOrProjectAffectChoiceList();
-							enabledTopPanel();
-							notifyListeners();
-						}
-					};
-					MiroAccessDB.getAssignments(callback);
-				} else {
-					String error = event.getResults();
-					error = error.substring(error.indexOf("<pre>") + 9, error
-							.indexOf("</pre>"));
-					Window.alert("-" + error + "-");
-				}
-				PartagedDataBetweenPanel.isImporting = false;
-				enabledTopPanel();
-				notifyListeners();
-			}
-		});
-		submitButton.setEnabled(false);
+		formPanel.setWidget(horizontalPanel);
 	}
 
 	private boolean isResponseServerOk(String response) {
-		response = response.substring(response.indexOf("<pre>") + 9, response
-				.indexOf("</pre>"));
-
-		return response.isEmpty();
+		return response.equals("<pre></pre>");
 	}
 
 	private void refreshLabPersonOrProjectChoice() {
@@ -253,6 +196,7 @@ public class TopPanel extends Composite implements EventListener {
 	}
 
 	private void refreshLabProjectOrPersonAffectChoice() {
+
 		switch (PartagedDataBetweenPanel.viewType) {
 		case PERSON_VIEW:
 			labPersonOrProjectAffectChoice.setText("Affecter un projet :");
@@ -261,17 +205,17 @@ public class TopPanel extends Composite implements EventListener {
 			labPersonOrProjectAffectChoice.setText("Affecter une personne :");
 			break;
 		}
+
 	}
 
-	public void refreshPersonOrProjectAffectChoiceList() {
+	private void refreshPersonOrProjectAffectChoiceList() {
 		int selectedIndex = personOrProjectChoiceList.getSelectedIndex();
+
 		personOrProjectAffectChoiceList.clear();
 		personOrProjectAffectChoiceList.addItem("Selectionnez");
 
 		switch (PartagedDataBetweenPanel.viewType) {
 		case PERSON_VIEW:
-			// Si l'utilisateur clique sur l'item 'selectionnez' de la liste
-			// déroulante,rien à faire
 			if (selectedIndex != 0) {
 				projectNotAssignedForPerson = MiroState
 						.getNotAssignedProject(PartagedDataBetweenPanel.currentPerson);
@@ -283,8 +227,6 @@ public class TopPanel extends Composite implements EventListener {
 			}
 			break;
 		case PROJECT_VIEW:
-			// Si l'utilisateur clique sur l'item 'selectionnez' de la liste
-			// déroulante,rien à faire
 			if (selectedIndex != 0) {
 				personNotAssignedForProject = MiroState
 						.getPersonNotAssigned(PartagedDataBetweenPanel.currentProject);
@@ -340,8 +282,7 @@ public class TopPanel extends Composite implements EventListener {
 
 			public void onChange(ChangeEvent changeEvent) {
 				int selectedIndex = personOrProjectAffectChoiceList
-
-				.getSelectedIndex();
+						.getSelectedIndex();
 
 				switch (PartagedDataBetweenPanel.viewType) {
 				case PERSON_VIEW:
@@ -349,9 +290,9 @@ public class TopPanel extends Composite implements EventListener {
 
 					if (selectedIndex != 0) {
 
-						Project project = projectNotAssignedForPerson
+						Project projectToAffect = projectNotAssignedForPerson
 								.get(selectedIndex - 1);
-						Assignment assignment = new Assignment(project,
+						Assignment assignment = new Assignment(projectToAffect,
 								currentPerson);
 
 						MiroState.addAssignment(assignment);
@@ -366,15 +307,14 @@ public class TopPanel extends Composite implements EventListener {
 
 					if (selectedIndex != 0) {
 
-						Person person = personNotAssignedForProject
+						Person personToAffect = personNotAssignedForProject
 								.get(selectedIndex - 1);
 						Assignment assignment = new Assignment(currentProject,
-								person);
+								personToAffect);
 
 						MiroState.addAssignment(assignment);
 
 						refreshPersonOrProjectChoiceList();
-
 						refreshPersonOrProjectAffectChoiceList();
 					}
 					break;
@@ -383,10 +323,46 @@ public class TopPanel extends Composite implements EventListener {
 			}
 		});
 
-	}
+		submitButton.addClickHandler(new ClickHandler() {
 
-	private void setEnabledSubmitButton() {
-		submitButton.setEnabled(!submitButton.isEnabled());
+			@Override
+			public void onClick(ClickEvent event) {
+				PartagedDataBetweenPanel.isImporting = true;
+				disabledTopPanel();
+				formPanel.submit();
+
+				notifyListeners();
+			}
+		});
+
+		formPanel.addSubmitCompleteHandler(new SubmitCompleteHandler() {
+
+			@Override
+			public void onSubmitComplete(SubmitCompleteEvent event) {
+				PartagedDataBetweenPanel.isImporting = false;
+
+				final AsyncCallback<List<Assignment>> GET_ASSIGNMENTS_CALLBACK = new AsyncCallback<List<Assignment>>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						Window.alert("Impossible d'obtenir les assignements ! ");
+					}
+
+					@Override
+					public void onSuccess(List<Assignment> result) {
+						MiroState.updateViewState(result);
+						refreshPersonOrProjectChoiceList();
+						setSelectedItemFromPersonOrProjectChoiceList();
+						refreshPersonOrProjectAffectChoiceList();
+						enabledTopPanel();
+						notifyListeners();
+						Window
+								.alert("Mise a jour et rafrachissement effectues");
+					}
+				};
+				MiroAccessDB.getAssignments(GET_ASSIGNMENTS_CALLBACK);
+			}
+		});
 	}
 
 	private void refreshPersonOrProjectChoiceList() {
@@ -419,9 +395,27 @@ public class TopPanel extends Composite implements EventListener {
 
 	@Override
 	public void notifyChange(Widget widget) {
-		if (widget instanceof BottomPanel)
-			setEnabledSubmitButton();
-		
+
+		if (PartagedDataBetweenPanel.isReadOnly) {
+			labPersonOrProjectAffectChoice.setVisible(false);
+			labImportFile.setVisible(false);
+			personOrProjectAffectChoiceList.setVisible(false);
+			formPanel.setVisible(false);
+		} else {
+			if (widget instanceof BottomPanel) {
+				if (PartagedDataBetweenPanel.isLocked) {
+					submitButton.setEnabled(true);
+
+					if (PartagedDataBetweenPanel.isSaving) {
+						disabledTopPanel();
+					}
+				} else {
+					enabledTopPanel();
+					submitButton.setEnabled(false);
+				}
+			}
+		}
+
 		refreshLabPersonOrProjectChoice();
 		refreshLabProjectOrPersonAffectChoice();
 		refreshPersonOrProjectChoiceList();
