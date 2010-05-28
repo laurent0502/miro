@@ -12,8 +12,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
- * Cette classe fait l'intermédiaire entre le code client et le code serveur de
- * mon application
+ * The class is a intermediate class between the client and the server
  **/
 public class MiroAccessDB {
 
@@ -21,10 +20,10 @@ public class MiroAccessDB {
 			.create(GreetingService.class);
 
 	/**
-	 * Fait appel au code serveur pour obtenir la liste des assignements
+	 * Call to get the assignment list
 	 * 
 	 * @param GET_ASSIGNMENTS_CALLBACK
-	 *            Param�tre qui re�oit la r�ponse du serveur
+	 *            Getting the response of the server
 	 **/
 	public static void getAssignments(
 			AsyncCallback<List<Assignment>> GET_ASSIGNMENTS_CALLBACK) {
@@ -32,14 +31,14 @@ public class MiroAccessDB {
 	}
 
 	/**
-	 * Fait appel au code serveur pour mettre les assignements à jour
+	 * Call to update the assignment list
 	 * 
 	 * @param personList
-	 *            Liste des personnes
+	 *            The person list
 	 * @param assignmentList
-	 *            Liste des assignements
+	 *            The assignment list
 	 * @param UPDATE_ASSIGNMENTS_CALLBACK
-	 *            Paramètre qui re�oit la r�ponse du serveur
+	 *            Getting the response of the server
 	 **/
 	public static void updateAssignments(List<Person> personList,
 			List<Assignment> assignmentList,
@@ -49,13 +48,12 @@ public class MiroAccessDB {
 	}
 
 	/**
-	 * Fait appel au serveur pour verouiller/d�verouiller en �criture la
-	 * table des assignements
+	 * Call to update the lock of the database
 	 * 
 	 * @param isLocked
-	 *            Dit si la table doit �tre verouill�e
+	 *            The boolean state of the lock
 	 * @param SET_LOCKED_CALLBACK
-	 *            Param�tre qui re�oit la r�ponse du serveur
+	 *            Getting the response of the server
 	 **/
 	public static void setLocked(boolean isLocked,
 			AsyncCallback SET_LOCKED_CALLBACK) {
@@ -63,22 +61,20 @@ public class MiroAccessDB {
 	}
 
 	/**
-	 * Fait appel au serveur pour obtenir l'entier qui repr�sente le mois
-	 * courant
+	 * Call to get the current month
 	 * 
 	 * @param MONTH_CALLBACK
-	 * 
+	 *            Getting the response of the server
 	 **/
 	public static void getMonthOfDate(AsyncCallback<String> MONTH_CALLBACK) {
 		greetingService.getMonthOfDate(MONTH_CALLBACK);
 	}
 
 	/**
-	 * Fait appel au serveur pour obtenir la liste des informations de logging
-	 * des utilisateurs
+	 * Call to get the connection list
 	 * 
 	 * @param CONNECTION_CALLBACK
-	 *            Param�tre qui re�oit la r�ponse du serveur
+	 *            Getting the response of the server
 	 **/
 	public static void getConnections(
 			AsyncCallback<List<Connection>> CONNECTION_CALLBACK) {

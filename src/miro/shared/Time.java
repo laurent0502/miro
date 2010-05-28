@@ -3,7 +3,7 @@ package miro.shared;
 import java.io.Serializable;
 
 /**
- * Cette classe représente une période
+ * This class represents a month and a year
  **/
 public class Time implements Serializable {
 
@@ -11,7 +11,7 @@ public class Time implements Serializable {
 	private int year;
 
 	/**
-	 * Construit un Time
+	 * Defines a Time with defaults month and year
 	 **/
 	public Time() {
 		month = 0;
@@ -19,12 +19,12 @@ public class Time implements Serializable {
 	}
 
 	/**
-	 * Construit un Time
+	 * Defines a Time
 	 * 
 	 * @param month
-	 *            Le mois
+	 *            The month
 	 * @param year
-	 *            L'année
+	 *            The year
 	 **/
 	public Time(int month, int year) {
 		this.month = month;
@@ -32,29 +32,29 @@ public class Time implements Serializable {
 	}
 
 	/**
-	 * Permet d'obtenir le mois
+	 * Returns the month
 	 * 
-	 * @return Le mois
+	 * @return The month
 	 **/
 	public int getMonth() {
 		return month;
 	}
 
 	/**
-	 * Permet d'obtenir l'année
+	 * Returns the year
 	 * 
-	 * @return L'année
+	 * @return The year
 	 **/
 	public int getYear() {
 		return year;
 	}
 
 	/**
-	 * Compare par égalité deux Time
+	 * Compares this Time to the specified object
 	 * 
 	 * @param o
-	 *            Objet qui représente un Time
-	 * @return true si les deux éléments sont égaux
+	 *            The object to compare this Time against
+	 * @return true if the Time are equal; false otherwise.
 	 **/
 	@Override
 	public boolean equals(Object o) {

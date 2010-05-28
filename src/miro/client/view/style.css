@@ -1,63 +1,75 @@
 .cellule {
-    background-color: cyan;
-    width: 5.0em;
+	background-color: cyan;
+	width: 5.0em;
 }
 
 .titleOfFirstColumn {
-    width: 250px;
-    height:20px;
-    color: black;
-    font-weight: bold;
-    border-right-color:black;
-    border-right-style:double;
+	width: 250px;
+	height: 20px;
+	color: black;
+	font-weight: bold;
+	border-right-color: black;
+	border-right-style: double;
 }
 
 .titleOfFirstRow {
-    text-align: center;
-    color: black;
-    font-weight: bolder;
-    font-size:12.5px;
-    border-bottom-color:black;
-    border-bottom-style:double;
+	text-align: center;
+	color: black;
+	font-weight: bolder;
+	font-size: 12.5px;
+	border-bottom-color: black;
+	border-bottom-style: double;
 }
 
 .gwt-PushButton {
-    width: 50px;
-    height: 50px;
+	width: 50px;
+	height: 50px;
 }
 
 .gwt-TextBox {
-    width: 75px;
-    height:18px;
-    text-align: center;
+	width: 75px;
+	height: 18px;
+	text-align: center;
 }
 
 .gwt-TextBox-readonly {
-	background:#f5f5f5;
-	color:black;
-	font-weight:bolder;
+	background: #f5f5f5;
+	color: black;
+	font-weight: bolder;
 }
 
 .red {
-    text-align:center;
-    color:red;
+	text-align: center;
+	color: red;
 }
 
 .green {
-    text-align: center;
-    color: green;
+	text-align: center;
+	color: green;
 }
 
 .orange {
-    text-align: center;
-    color: orange;
+	text-align: center;
+	color: orange;
 }
 
 .textbox-nameOfProjectOrPerson {
-    cursor : pointer;
+	cursor: pointer;
 }
 
-.gwt-DialogBox{
-	margin-left : 450px;
-	margin-top : 200px; 
+.gwt-DialogBox {
+	margin-left: 450px;
+	margin-top: 200px;
+	horizontal-align: middle;
+}
+
+.columnOfRowsSum {
+	background-color: #FFFACD;
+}
+
+.banniereCIRB {
+	background-image: url(banniereCIRB.jpg);
+	horizontal-align: top;
+	height: 110px;
+	width: 930px;
 }

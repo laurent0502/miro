@@ -18,7 +18,7 @@
 		<servlet-name>SampleUploadServlet</servlet-name>
 		<servlet-class>miro.server.SampleUploadServlet</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>SampleUploadServlet</servlet-name>
 		<url-pattern>/mirov2/SampleUploadServlet</url-pattern>

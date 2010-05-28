@@ -2,13 +2,22 @@ package miro.client.view;
 
 import com.google.gwt.user.client.ui.TextBox;
 
+/**
+ * This class represents a row containing the set of the months
+ */
 public class MonthRow extends Row {
 	private int currentYear;
 
-	public MonthRow(int currentYear) {
+	/**
+	 * Defines a MonthRow with the year specified
+	 * 
+	 * @param year
+	 *            The year
+	 */
+	public MonthRow(int year) {
 		super();
 
-		this.currentYear = currentYear;
+		this.currentYear = year;
 
 		initArray();
 		disabledCells();

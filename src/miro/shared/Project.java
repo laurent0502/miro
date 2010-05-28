@@ -3,44 +3,44 @@ package miro.shared;
 import java.io.Serializable;
 
 /**
- * Cette classe représente un projet du département Projet
+ * This class represents a project from the project department
  **/
 public class Project implements Serializable, Comparable {
 
 	private String name;
 
 	/**
-	 * Construit un Project par défaut
+	 * Defines a project with a default name
 	 **/
 	public Project() {
 		name = "";
 	}
 
 	/**
-	 * Construit un Project
+	 * Defines a project with its name
 	 * 
 	 * @param name
-	 *            Nom du projet
+	 *            Name of the project
 	 **/
 	public Project(String name) {
 		this.name = name;
 	}
 
 	/**
-	 * Permet d'obtenir le nom du projet
+	 * Return the project's name
 	 * 
-	 * @return Le nom
+	 * @return The name
 	 **/
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * Compare par égalité deux Project
+	 * Compares this Project to the specified object
 	 * 
 	 * @param o
-	 *            Objet à comparer et censé représenter un Projet
-	 * @return true si les deux éléments sont égaux
+	 *            The object to compare this Project against
+	 * @return true if the Project are equal; false otherwise.
 	 **/
 	public boolean equals(Object o) {
 		boolean isEquals = false;
@@ -62,13 +62,13 @@ public class Project implements Serializable, Comparable {
 	}
 
 	/**
-	 * Compare le nom de deux projets
+	 * Compares the egality of the name of two project
 	 * 
 	 * @param arg0
-	 *            Objet censé représenter le projet à comparer
-	 * @return 1 si le nom du projet courant est plus grand que l'autre
-	 * @return 0 si le nom des deux projets sont égaux
-	 * @return -1 si le nom du projet courant est plus petit que l'autre
+	 *            The object to compare this Project against
+	 * @return 1 if the name of the current project is greater
+	 * @return 0 if the name of the current project is equals
+	 * @return -1 if the name of the current project is smaller
 	 **/
 	@Override
 	public int compareTo(Object arg0) {

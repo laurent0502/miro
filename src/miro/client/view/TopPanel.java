@@ -29,6 +29,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 
+/**
+ * This class represents the panel containing the north elements of the
+ * application
+ */
 public class TopPanel extends Composite implements EventListener {
 
 	interface TopPanelUiBinder extends UiBinder<AbsolutePanel, TopPanel> {
@@ -61,34 +65,35 @@ public class TopPanel extends Composite implements EventListener {
 
 	private List<Person> personList;
 	private List<Project> projectList;
-	private List<Project> projectNotAssignedForPerson;
-	private List<Person> personNotAssignedForProject;
+	private List<Project> projectsNotAssignedForPerson;
+	private List<Person> personsNotAssignedForProject;
 
 	private Button submitButton = new Button("SUBMIT");
 
 	private static List<EventListener> eventListenerList = new ArrayList<EventListener>();
 
+	/**
+	 * Defines a TopPanel
+	 */
 	public TopPanel() {
-		boolean isReadOnly = PartagedDataBetweenPanel.isReadOnly;
+
 		initWidget(ourUiBinder.createAndBindUi(this));
-		initAbsolutePanel();
 		initTopPanel();
+
+		CenterPanel.addEventListener(this);
+		BottomPanel.addEventListener(this);
+	}
+
+	private void initTopPanel() {
+		initAbsolutePanel();
+
+		boolean isReadOnly = PartagedDataBetweenPanel.isReadOnly;
 
 		labPersonOrProjectAffectChoice.setVisible(!isReadOnly);
 		labImportFile.setVisible(!isReadOnly);
 		personOrProjectAffectChoiceList.setVisible(!isReadOnly);
 		formPanel.setVisible(!isReadOnly);
-		// TODO REMOVE
-		CenterPanel.addEventListener(this);
-		BottomPanel.addEventListener(this);
-	}
 
-	private void ajustList() {
-		personOrProjectAffectChoiceList
-				.setEnabled(!PartagedDataBetweenPanel.isReadOnly);
-	}
-
-	private void initTopPanel() {
 		refreshPersonOrProjectChoiceList();
 		refreshPersonOrProjectAffectChoiceList();
 		initListeners();
@@ -106,6 +111,12 @@ public class TopPanel extends Composite implements EventListener {
 		submitButton.setEnabled(true);
 	}
 
+	/**
+	 * Adds the specified event listener to receive action events
+	 * 
+	 * @param eventListener
+	 *            The event listener
+	 */
 	public static void addEventListener(EventListener eventListener) {
 		eventListenerList.add(eventListener);
 	}
@@ -144,10 +155,6 @@ public class TopPanel extends Composite implements EventListener {
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
 		formPanel.setWidget(horizontalPanel);
-	}
-
-	private boolean isResponseServerOk(String response) {
-		return response.equals("<pre></pre>");
 	}
 
 	private void refreshLabPersonOrProjectChoice() {
@@ -217,10 +224,10 @@ public class TopPanel extends Composite implements EventListener {
 		switch (PartagedDataBetweenPanel.viewType) {
 		case PERSON_VIEW:
 			if (selectedIndex != 0) {
-				projectNotAssignedForPerson = MiroState
+				projectsNotAssignedForPerson = MiroState
 						.getNotAssignedProject(PartagedDataBetweenPanel.currentPerson);
 
-				for (Project projectFromList : projectNotAssignedForPerson) {
+				for (Project projectFromList : projectsNotAssignedForPerson) {
 					personOrProjectAffectChoiceList.addItem(projectFromList
 							.getName());
 				}
@@ -228,10 +235,10 @@ public class TopPanel extends Composite implements EventListener {
 			break;
 		case PROJECT_VIEW:
 			if (selectedIndex != 0) {
-				personNotAssignedForProject = MiroState
+				personsNotAssignedForProject = MiroState
 						.getPersonNotAssigned(PartagedDataBetweenPanel.currentProject);
 
-				for (Person personFromList : personNotAssignedForProject) {
+				for (Person personFromList : personsNotAssignedForProject) {
 					String lastName = personFromList.getLastName();
 					String firstName = personFromList.getFirstName();
 					String item = lastName + " " + firstName;
@@ -290,7 +297,7 @@ public class TopPanel extends Composite implements EventListener {
 
 					if (selectedIndex != 0) {
 
-						Project projectToAffect = projectNotAssignedForPerson
+						Project projectToAffect = projectsNotAssignedForPerson
 								.get(selectedIndex - 1);
 						Assignment assignment = new Assignment(projectToAffect,
 								currentPerson);
@@ -307,7 +314,7 @@ public class TopPanel extends Composite implements EventListener {
 
 					if (selectedIndex != 0) {
 
-						Person personToAffect = personNotAssignedForProject
+						Person personToAffect = personsNotAssignedForProject
 								.get(selectedIndex - 1);
 						Assignment assignment = new Assignment(currentProject,
 								personToAffect);
@@ -345,12 +352,14 @@ public class TopPanel extends Composite implements EventListener {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Window.alert("Impossible d'obtenir les assignements ! ");
+						Window
+								.alert("Impossible d'obtenir les assignements ! ");
 					}
 
 					@Override
 					public void onSuccess(List<Assignment> result) {
 						MiroState.updateViewState(result);
+
 						refreshPersonOrProjectChoiceList();
 						setSelectedItemFromPersonOrProjectChoiceList();
 						refreshPersonOrProjectAffectChoiceList();
@@ -366,7 +375,6 @@ public class TopPanel extends Composite implements EventListener {
 	}
 
 	private void refreshPersonOrProjectChoiceList() {
-
 		personOrProjectChoiceList.clear();
 		personOrProjectChoiceList.addItem("Selectionnez");
 
@@ -393,6 +401,12 @@ public class TopPanel extends Composite implements EventListener {
 		}
 	}
 
+	/**
+	 * Implemented method for all listeners
+	 * 
+	 * @param widget
+	 *            The widget sending the event
+	 */
 	@Override
 	public void notifyChange(Widget widget) {
 
@@ -402,7 +416,9 @@ public class TopPanel extends Composite implements EventListener {
 			personOrProjectAffectChoiceList.setVisible(false);
 			formPanel.setVisible(false);
 		} else {
+
 			if (widget instanceof BottomPanel) {
+
 				if (PartagedDataBetweenPanel.isLocked) {
 					submitButton.setEnabled(true);
 
@@ -414,8 +430,8 @@ public class TopPanel extends Composite implements EventListener {
 					submitButton.setEnabled(false);
 				}
 			}
-		}
 
+		}
 		refreshLabPersonOrProjectChoice();
 		refreshLabProjectOrPersonAffectChoice();
 		refreshPersonOrProjectChoiceList();

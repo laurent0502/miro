@@ -6,8 +6,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Id;
 
 /**
- * Cette classe rep�sente un projet associ� � une personne avec les diff�rentes
- * prestations
+ * This class defines a project contains a person with his prestations
  **/
 public class Assignment implements Serializable {
 
@@ -24,7 +23,7 @@ public class Assignment implements Serializable {
 	private Record[] recordListOfPrestation = new Record[12];
 
 	/**
-	 * Construit un Assignment par d�faut
+	 * Defines a Assignment with a project and a person with null value
 	 **/
 	public Assignment() {
 		project = null;
@@ -33,12 +32,12 @@ public class Assignment implements Serializable {
 	}
 
 	/**
-	 * Construit un Assignment
+	 * Defines a Assignment with the project and the person specified
 	 * 
 	 * @param project
-	 *            Le projet
+	 *            A project
 	 * @param personne
-	 *            La personne
+	 *            A person
 	 **/
 	public Assignment(Project project, Person person) {
 		this.project = project;
@@ -46,9 +45,6 @@ public class Assignment implements Serializable {
 		initRecordListOfPrestation();
 	}
 
-	/**
-	 * Permet d'initialiser la liste des prestations
-	 **/
 	private void initRecordListOfPrestation() {
 		for (int i = 0; i < recordListOfPrestation.length; i++) {
 			recordListOfPrestation[i] = new Record();
@@ -56,62 +52,62 @@ public class Assignment implements Serializable {
 	}
 
 	/**
-	 * Permet d'obtenir une prestation de la liste
+	 * Returns a prestation of the list
 	 * 
 	 * @param index
-	 *            Indice de la prestation dans la liste
-	 * @return La prestation
+	 *            Index of the prestation in the list
+	 * @return The prestation
 	 **/
 	public Record getPrestation(int index) {
 		return recordListOfPrestation[index];
 	}
 
 	/**
-	 * Permet de modifier une prestation de la liste
+	 * Set a prestation of the list
 	 * 
-	 * @param i
-	 *            Indice de la prestation dans la liste
+	 * @param index
+	 *            Index of the prestation in the list
 	 * @param record
-	 *            Nouvelle prestation
+	 *            The new prestation
 	 **/
-	public void setPrestation(int i, Record record) {
-		recordListOfPrestation[i] = record;
+	public void setPrestation(int index, Record record) {
+		recordListOfPrestation[index] = record;
 	}
 
 	/**
-	 * Permet d'obtenir le projet
+	 * Returns the current project
 	 * 
-	 * @return Le projet
+	 * @return The project,or null if none was supplied
 	 **/
 	public Project getProject() {
 		return project;
 	}
 
 	/**
-	 * Permet d'obtenir la personne
+	 * Returns the current person
 	 * 
-	 * @return La personne
+	 * @return The person,or null if none was supplied
 	 **/
 	public Person getPerson() {
 		return person;
 	}
 
 	/**
-	 * Modifie la personne
+	 * Set the current person
 	 * 
 	 * @param person
-	 *            La personne
+	 *            The new person
 	 **/
 	public void setPerson(Person person) {
 		this.person = person;
 	}
 
 	/**
-	 * Compare par �galit� deux assignements
+	 * Compares this Assignment to the specified object
 	 * 
 	 * @param o
-	 *            Objet cens� repr�sent� l'Assignment � comparer
-	 * @return true si les deux �l�ments sont �gaux
+	 *            The object to compare this Assignment against
+	 * @return true if the Assignment are equal; false otherwise.
 	 **/
 	public boolean equals(Object o) {
 		boolean isEquals = false;

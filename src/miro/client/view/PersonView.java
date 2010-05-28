@@ -6,6 +6,10 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 
+/**
+ * This class represents the person view of the application with its different
+ * components
+ */
 public class PersonView extends Composite {
 
 	interface PersonViewUiBinder extends UiBinder<DockLayoutPanel, PersonView> {
@@ -16,6 +20,9 @@ public class PersonView extends Composite {
 
 	DockLayoutPanel rootElement = ourUiBinder.createAndBindUi(this);
 
+	/**
+	 * Defines a PersonView
+	 */
 	public PersonView() {
 		RootLayoutPanel.get().add(rootElement);
 	}

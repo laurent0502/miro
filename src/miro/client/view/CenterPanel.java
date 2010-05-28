@@ -28,6 +28,10 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
+/**
+ * This class represents the center panel contains the array of the person and
+ * project view
+ */
 public class CenterPanel extends Composite implements EventListener {
 
 	interface GlobalResources extends ClientBundle {
@@ -51,9 +55,13 @@ public class CenterPanel extends Composite implements EventListener {
 
 	private List<ProjectRow> projectRowList = new ArrayList<ProjectRow>();
 
+	private final int pourcentLimitKPI = 82;
+
 	private static List<EventListener> eventListenerList = new ArrayList<EventListener>();
+
 	/*
-	 * Permet l'insertion de projets au bon endroit dans le tableau
+	 * indexDeparture attribute allows to add projects or persons in the right
+	 * place in the array
 	 */
 	private int indexDeparture;
 	private int currentMonth;
@@ -61,12 +69,16 @@ public class CenterPanel extends Composite implements EventListener {
 	@UiField
 	FlexTable personArray;
 
+	/**
+	 * Defines a CenterPanel
+	 */
 	public CenterPanel() {
 		GWT.<GlobalResources> create(GlobalResources.class).css()
 				.ensureInjected();
 		initWidget(ourUiBinder.createAndBindUi(this));
 
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
+
 			@Override
 			public void onFailure(Throwable caught) {
 			}
@@ -78,14 +90,24 @@ public class CenterPanel extends Composite implements EventListener {
 			}
 		};
 		MiroAccessDB.getMonthOfDate(callback);
+
 		TopPanel.addEventListener(this);
 		BottomPanel.addEventListener(this);
 	}
 
+	/**
+	 * Adds the specified event listener
+	 * 
+	 * @param eventListener
+	 *            The event listener
+	 */
 	public static void addEventListener(EventListener eventListener) {
 		eventListenerList.add(eventListener);
 	}
 
+	/**
+	 * Refresh the CenterPanel
+	 */
 	public void refreshCenterPanel() {
 		if (PartagedDataBetweenPanel.hasChangedView) {
 			PartagedDataBetweenPanel.hasChangedView = false;
@@ -100,13 +122,16 @@ public class CenterPanel extends Composite implements EventListener {
 				initCalcRowList();
 				refreshProjectRowList();
 				refreshCalcRowList();
+				refreshStyleOfKPIRow();
 				refreshStyleOfTotalPourcentRow();
+				refreshStyleOfSumColumn();
 				break;
 
 			case PROJECT_VIEW:
 				indexDeparture = 1;
 				refreshProjectRowList();
 				refreshCalcRowForProjectView();
+				refreshStyleOfSumColumn();
 				break;
 			}
 		} else {
@@ -115,11 +140,14 @@ public class CenterPanel extends Composite implements EventListener {
 				refreshTitleRowList();
 				refreshProjectRowList();
 				refreshCalcRowList();
+				refreshStyleOfKPIRow();
 				refreshStyleOfTotalPourcentRow();
+				refreshStyleOfSumColumn();
 				break;
 			case PROJECT_VIEW:
 				refreshProjectRowList();
 				refreshCalcRowForProjectView();
+				refreshStyleOfSumColumn();
 				break;
 			}
 		}
@@ -149,8 +177,10 @@ public class CenterPanel extends Composite implements EventListener {
 	}
 
 	private void initTitleRowListeners() {
+
 		for (int i = 0; i < titlesRowArray.length; i++) {
 			for (int j = 2; j < titlesRowArray[i].length(); j++) {
+
 				TextBox textboxOfTitleList = (TextBox) titlesRowArray[i]
 						.getElementAt(j);
 				double valueOfTextbox = Double.valueOf(textboxOfTitleList
@@ -163,6 +193,7 @@ public class CenterPanel extends Composite implements EventListener {
 	}
 
 	private void disabledAllTitleRow() {
+
 		for (int i = 2; i < titlesRowArray.length; i++) {
 			for (int j = 1; j < titlesRowArray[i].length(); j++) {
 				((TextBox) titlesRowArray[i].getElementAt(j)).setReadOnly(true);
@@ -171,23 +202,12 @@ public class CenterPanel extends Composite implements EventListener {
 	}
 
 	private void enabledAllTitleRow() {
+
 		for (int i = 2; i < titlesRowArray.length; i++) {
 			for (int j = 2; j < titlesRowArray[i].length(); j++) {
 				((TextBox) titlesRowArray[i].getElementAt(j))
 						.setReadOnly(false);
 			}
-		}
-	}
-
-	private void disabledOrEnabledAllTitleRow() {
-		switch (PartagedDataBetweenPanel.viewType) {
-		case PERSON_VIEW:
-			if (PartagedDataBetweenPanel.currentPerson == null) {
-				disabledAllTitleRow();
-			} else {
-				enabledAllTitleRow();
-			}
-			break;
 		}
 	}
 
@@ -219,6 +239,7 @@ public class CenterPanel extends Composite implements EventListener {
 		for (int i = 1; i < calcRowArray[6].length(); i++) {
 
 			TextBox textBoxOfACell = (TextBox) (calcRowArray[6].getElementAt(i));
+
 			String txtNumberOfTextBox = textBoxOfACell.getText();
 			txtNumberOfTextBox = txtNumberOfTextBox.substring(0,
 					txtNumberOfTextBox.length() - 1);
@@ -230,11 +251,54 @@ public class CenterPanel extends Composite implements EventListener {
 
 			if (valueOfTextBox > 100) {
 				textBoxOfACell.addStyleName("red");
-			}
-			else{
+			} else {
 				textBoxOfACell.addStyleName("green");
 			}
 		}
+	}
+
+	private void refreshStyleOfKPIRow() {
+
+		for (int i = 1; i < calcRowArray[7].length(); i++) {
+			TextBox textbox = (TextBox) calcRowArray[7].getElementAt(i);
+
+			String valueOfTextBox = textbox.getText();
+			valueOfTextBox = valueOfTextBox.substring(0, valueOfTextBox
+					.indexOf("%"));
+
+			double value = Double.valueOf(valueOfTextBox);
+
+			textbox.removeStyleName("red");
+			textbox.removeStyleName("green");
+
+			if (value > pourcentLimitKPI) {
+				textbox.addStyleName("green");
+			} else {
+				textbox.addStyleName("red");
+			}
+		}
+	}
+
+	private void refreshStyleOfSumColumn() {
+		((TextBox) monthRow.getElementAt(1)).addStyleName("columnOfRowsSum");
+
+		for (int i = 0; i < titlesRowArray.length; i++) {
+			((TextBox) titlesRowArray[i].getElementAt(1))
+					.addStyleName("columnOfRowsSum");
+		}
+
+		for (int i = 0; i < calcRowArray.length; i++) {
+			((TextBox) calcRowArray[i].getElementAt(1))
+					.addStyleName("columnOfRowsSum");
+		}
+
+		for (int i = 0; i < projectRowList.size(); i++) {
+			((TextBox) projectRowList.get(i).getElementAt(1))
+					.addStyleName("columnOfRowsSum");
+		}
+
+		((TextBox) calcRowForProjectView.getElementAt(1))
+				.addStyleName("columnOfRowsSum");
 	}
 
 	private void refreshProjectRowList() {
@@ -242,7 +306,7 @@ public class CenterPanel extends Composite implements EventListener {
 
 		projectRowList.clear();
 
-		// Obtention de la liste d'assignement qui nous concerne
+		// Getting the assignment for the current person or project
 		switch (PartagedDataBetweenPanel.viewType) {
 		case PERSON_VIEW:
 			assignmentList = MiroState
@@ -256,7 +320,7 @@ public class CenterPanel extends Composite implements EventListener {
 			assignmentList = new ArrayList<Assignment>();
 		}
 
-		// Parcours des assignments pour les mettre dans des ProjectRow
+		// Browsing the assignment list to put in the ProjecRow list
 		for (int i = 0; i < assignmentList.size(); i++) {
 			Assignment assignment = assignmentList.get(i);
 			String personOrProjectName = "";
@@ -272,7 +336,6 @@ public class CenterPanel extends Composite implements EventListener {
 			}
 			ProjectRow projectRow = new ProjectRow(personOrProjectName);
 
-			// TextBox textBox = (TextBox) projectRow.getElementAt(0);
 			((TextBox) projectRow.getElementAt(0))
 					.setStyleName("titleOfFirstColumn");
 			((TextBox) projectRow.getElementAt(0))
@@ -286,9 +349,9 @@ public class CenterPanel extends Composite implements EventListener {
 				int sizeProjectRowList = projectRowList.size();
 				MyProjectListener projectListener = new MyProjectListener(
 						sizeProjectRowList, j + 1, record.getNumber());
-				TextBox textBox2 = (TextBox) projectRow.getElementAt(j + 2);
+				TextBox textBox = (TextBox) projectRow.getElementAt(j + 2);
 
-				textBox2.addChangeHandler(projectListener);
+				textBox.addChangeHandler(projectListener);
 				projectRow.setElementAt(j + 2, record.getNumber());
 			}
 			double sumOfTheProjectRow = projectRow.sumRow();
@@ -311,6 +374,7 @@ public class CenterPanel extends Composite implements EventListener {
 	private void initTitleRowList() {
 		Record[] recordOfNumberDaysByMonth = OfficialInformation.numberDaysByMonthArray;
 		Record[] recordOfNumberOfficialHolidaysArray = OfficialInformation.numberOfficialHolidaysArray;
+
 		titlesRowArray[0] = new TitleRow("Nombre Total de Jours", false);
 		titlesRowArray[1] = new TitleRow("Conges legaux & CIRB", false);
 		titlesRowArray[2] = new TitleRow("Conges et Absences", true);
@@ -318,11 +382,16 @@ public class CenterPanel extends Composite implements EventListener {
 		titlesRowArray[4] = new TitleRow("Activites Hors-Projets", true);
 
 		for (int i = 2; i < titlesRowArray[0].length(); i++) {
-			titlesRowArray[0].setElementAt(i, recordOfNumberDaysByMonth[i - 2]
-					.getNumber());
+			double valueOfNumberDaysByMonthArray = recordOfNumberDaysByMonth[i - 2]
+					.getNumber();
+			double valueOfNumberOfficialHolidaysArray = recordOfNumberOfficialHolidaysArray[i - 2]
+					.getNumber();
+
+			titlesRowArray[0].setElementAt(i, valueOfNumberDaysByMonthArray);
 			titlesRowArray[1].setElementAt(i,
-					recordOfNumberOfficialHolidaysArray[i - 2].getNumber());
+					valueOfNumberOfficialHolidaysArray);
 		}
+
 		titlesRowArray[0].setElementAt(1, titlesRowArray[0].sumRow());
 		titlesRowArray[1].setElementAt(1, titlesRowArray[1].sumRow());
 
@@ -349,7 +418,7 @@ public class CenterPanel extends Composite implements EventListener {
 	}
 
 	private void refreshTitleRowList() {
-		// brol();
+
 		for (int i = 2; i < titlesRowArray.length; i++) {
 			for (int j = 2; j < titlesRowArray[i].length(); j++) {
 				Record record = new Record();
@@ -597,16 +666,24 @@ public class CenterPanel extends Composite implements EventListener {
 			addRowToArray(RowType.TITLEROW);
 			addRowToArray(RowType.CALCROW);
 			addRowToArray(RowType.PROJECTROW);
-			disabledOrEnabledAllTitleRow();
+
+			if (PartagedDataBetweenPanel.currentPerson == null) {
+				disabledAllTitleRow();
+			} else {
+				enabledAllTitleRow();
+			}
 			break;
 		case PROJECT_VIEW:
 			addRowToArray(RowType.PROJECTROW);
 			addRowToArray(RowType.CALCROW);
 			break;
 		}
+
 		disabledColumnsOfPreviousMonth();
+
 		if (PartagedDataBetweenPanel.isReadOnly
-				|| PartagedDataBetweenPanel.isImporting || PartagedDataBetweenPanel.isSaving) {
+				|| PartagedDataBetweenPanel.isImporting
+				|| PartagedDataBetweenPanel.isSaving) {
 			disabledAllTitleRow();
 			disabledAllProjectRow();
 		}
@@ -693,6 +770,12 @@ public class CenterPanel extends Composite implements EventListener {
 		}
 	}
 
+	/**
+	 * Implemented method by all listeners
+	 * 
+	 * @param widget
+	 *            The widget sending the event
+	 */
 	@Override
 	public void notifyChange(Widget widget) {
 		refreshCenterPanel();
@@ -730,6 +813,8 @@ public class CenterPanel extends Composite implements EventListener {
 					refreshTitleRowList();
 					refreshCalcRowList();
 					refreshStyleOfTotalPourcentRow();
+					refreshStyleOfKPIRow();
+					refreshStyleOfSumColumn();
 				}
 			}
 		}
@@ -794,6 +879,7 @@ public class CenterPanel extends Composite implements EventListener {
 
 			switch (PartagedDataBetweenPanel.viewType) {
 			case PERSON_VIEW:
+
 				assignment = MiroState.getAssignment(
 						PartagedDataBetweenPanel.currentPerson, new Project(
 								titleOfRow));
@@ -801,8 +887,13 @@ public class CenterPanel extends Composite implements EventListener {
 
 				refreshCalcRowList();
 				refreshStyleOfTotalPourcentRow();
+				refreshStyleOfKPIRow();
+				refreshStyleOfSumColumn();
+
 				break;
+
 			case PROJECT_VIEW:
+
 				int indexSpacing = titleOfRow.indexOf(" ");
 				String lastName = titleOfRow.substring(0, indexSpacing);
 				String firstName = titleOfRow.substring(indexSpacing + 1);
@@ -812,6 +903,8 @@ public class CenterPanel extends Composite implements EventListener {
 				assignment.setPrestation(columnNumber - 1, record);
 
 				refreshCalcRowForProjectView();
+				refreshStyleOfSumColumn();
+
 				break;
 			}
 			double sumOfTheProjectRow = projectRow.sumRow();

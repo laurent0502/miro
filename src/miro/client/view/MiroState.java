@@ -8,11 +8,22 @@ import miro.shared.Assignment;
 import miro.shared.Person;
 import miro.shared.Project;
 
+/**
+ * This class contains the informations to print
+ */
 public class MiroState {
 	private static List<Person> personList = new ArrayList<Person>();
 	private static List<Project> projectList = new ArrayList<Project>();
 	private static List<Assignment> assignmentList = new ArrayList<Assignment>();
 
+	/**
+	 * Returns the project list which contains the not assigned projects for a
+	 * person specified
+	 * 
+	 * @param person
+	 *            The person
+	 * @return The list
+	 */
 	public static List<Project> getNotAssignedProject(Person person) {
 		List<Project> projectNotAssigned = new ArrayList<Project>();
 
@@ -29,6 +40,14 @@ public class MiroState {
 		return projectNotAssigned;
 	}
 
+	/**
+	 * Return the person list which contains the persons not affected on the
+	 * project specified
+	 * 
+	 * @param project
+	 *            The project
+	 * @return The list
+	 */
 	public static List<Person> getPersonNotAssigned(Project project) {
 		List<Person> personNotAssignedOfProject = new ArrayList<Person>();
 
@@ -47,6 +66,13 @@ public class MiroState {
 		return personNotAssignedOfProject;
 	}
 
+	/**
+	 * Return the assignments of a person
+	 * 
+	 * @param person
+	 *            The person
+	 * @return The list
+	 */
 	public static List<Assignment> getAssignments(Person person) {
 		List<Assignment> assignmentFromPerson = new ArrayList<Assignment>();
 
@@ -61,6 +87,13 @@ public class MiroState {
 		return assignmentFromPerson;
 	}
 
+	/**
+	 * Return the assignments list for a project specified
+	 * 
+	 * @param project
+	 *            The project
+	 * @return The list
+	 */
 	public static List<Assignment> getAssignments(Project project) {
 		List<Assignment> assignmentFromProject = new ArrayList<Assignment>();
 
@@ -75,6 +108,15 @@ public class MiroState {
 		return assignmentFromProject;
 	}
 
+	/**
+	 * Returns a person with its last and first name specified
+	 * 
+	 * @param lastName
+	 *            Last name of the person
+	 * @param firstName
+	 *            First name of the person
+	 * @return The person
+	 */
 	public static Person getPerson(String lastName, String firstName) {
 		Person person = new Person(lastName, firstName);
 
@@ -86,6 +128,15 @@ public class MiroState {
 		return personList.get(indexOf);
 	}
 
+	/**
+	 * Returns the assignment from a person and a project specified
+	 * 
+	 * @param person
+	 *            The person
+	 * @param project
+	 *            The project
+	 * @return The assignment
+	 */
 	public static Assignment getAssignment(Person person, Project project) {
 
 		Assignment assignment = new Assignment(project, person);
@@ -136,8 +187,15 @@ public class MiroState {
 
 	}
 
-	public static Project getProject(String name) {
-		Project project = new Project(name);
+	/**
+	 * Returns the project with its name specified
+	 * 
+	 * @param projectName
+	 *            Name of the project
+	 * @return The project
+	 */
+	public static Project getProject(String projectName) {
+		Project project = new Project(projectName);
 
 		int indexOfProject = projectList.indexOf(project);
 

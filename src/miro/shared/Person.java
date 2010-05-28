@@ -7,7 +7,7 @@ import java.util.List;
 import javax.persistence.Embedded;
 
 /**
- * Cette classe repr�sente une personne du d�partement Projet
+ * This class represents a person from the project department
  **/
 public class Person implements Serializable, Comparable {
 
@@ -20,24 +20,24 @@ public class Person implements Serializable, Comparable {
 	@Embedded
 	private List<Record> trainingList = new ArrayList<Record>();
 
-	// liste des prestations pour les activit�s hors-projets
+	// liste des prestations pour les activites hors-projets
 	@Embedded
 	private List<Record> otherList = new ArrayList<Record>();
 
 	/**
-	 * Construit une personne
+	 * Defines a person with defaults last name and first name
 	 **/
 	public Person() {
 		initLists();
 	}
 
 	/**
-	 * Construit une personne
+	 * Defines a person with a last and first name specified
 	 * 
 	 * @param lastName
-	 *            Nom de la personne
+	 *            Last name of the person
 	 * @param firstName
-	 *            Pr�nom de la personne
+	 *            First name of the person
 	 **/
 	public Person(String lastName, String firstName) {
 		this.lastName = lastName.toUpperCase();
@@ -46,9 +46,6 @@ public class Person implements Serializable, Comparable {
 		initLists();
 	}
 
-	/**
-	 * Initialise la liste des absences,formations et activit�s hors-projets
-	 **/
 	private void initLists() {
 		Record record = null;
 
@@ -75,12 +72,11 @@ public class Person implements Serializable, Comparable {
 	}
 
 	/**
-	 * Permet d'obtenir la prestation pour une p�riode de vacances de la
-	 * personne
+	 * Returns a benefit from the holidays list for a Time specified
 	 * 
 	 * @param time
-	 *            P�riode sur laquelle on veut obtenir la prestation
-	 * @return La prestation
+	 *            The time
+	 * @return The benefit
 	 **/
 	public Record getHoliday(final Time time) {
 		Record recordToReturn = null;
@@ -96,12 +92,11 @@ public class Person implements Serializable, Comparable {
 	}
 
 	/**
-	 * Permet d'obtenir la prestation pour une p�riode de formations de la
-	 * personne
+	 * Returns a benefit from the training list for a time specified
 	 * 
 	 * @param time
-	 *            P�riode sur laquelle on veut obtenir la prestation
-	 * @return La prestation
+	 *            The time
+	 * @return The benefit
 	 **/
 	public Record getTraining(final Time time) {
 		Record recordToReturn = null;
@@ -117,12 +112,12 @@ public class Person implements Serializable, Comparable {
 	}
 
 	/**
-	 * Permet d'obtenir la prestation pour une p�riode d'activit�s hors-projets
-	 * de la personne
+	 * Returns the benefit from the out-project activities list for a time
+	 * specified
 	 * 
 	 * @param time
-	 *            P�riode sur laquelle on veut obtenir la prestation
-	 * @return La prestation
+	 *            The time
+	 * @return The benefit
 	 **/
 	public Record getOther(final Time time) {
 		Record recordToReturn = null;
@@ -138,29 +133,29 @@ public class Person implements Serializable, Comparable {
 	}
 
 	/**
-	 * Permet d'obtenir le nom de la personne
+	 * Returns the last name of the person
 	 * 
-	 * @return Le nom
+	 * @return The last name
 	 **/
 	public String getLastName() {
 		return lastName;
 	}
 
 	/**
-	 * Permet d'obtenir le pr�nom de la personne
+	 * Returns the first name of the person
 	 * 
-	 * @return Le pr�nom
+	 * @return The first name
 	 **/
 	public String getFirstName() {
 		return firstName;
 	}
 
 	/**
-	 * Compare par �galit� deux personnes
+	 * Compares this Person to the specified object
 	 * 
 	 * @param o
-	 *            Objet � comparer �tant cens� repr�senter une personne
-	 * @return true si les deux personnes sont �gaux
+	 *            The object to compare this Person against
+	 * @return true if the Person are equal; false otherwise.
 	 **/
 	public boolean equals(Object o) {
 
@@ -177,13 +172,13 @@ public class Person implements Serializable, Comparable {
 	}
 
 	/**
-	 * Compare par �galit� les noms de deux personnes
+	 * Compares the egality of the last name of two person
 	 * 
 	 * @param arg0
-	 *            Objet qui repr�sente la personne
-	 * @return 1 si le nom de la personne courante est plus grande
-	 * @return 0 si le nom de la personne courante est �gal
-	 * @return -1 si le nom de la personne courante est plus petite
+	 *            The object to compare this Person against
+	 * @return 1 if the last name of the current person is greater
+	 * @return 0 if the last name of the current person is equals
+	 * @return -1 if the last name of the current person is smaller
 	 **/
 	@Override
 	public int compareTo(Object arg0) {

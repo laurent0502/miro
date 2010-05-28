@@ -2,15 +2,27 @@ package miro.client.view;
 
 import com.google.gwt.i18n.client.NumberFormat;
 
+/**
+ * This class represents a row with calculate column value
+ */
 public class CalcRow extends Row {
 	private final NumberFormat NUMBER_FORMAT_IN_POURCENT = NumberFormat
 			.getFormat("0.0");
-	private boolean printPourcentageSymbol;
+	private boolean printPercentageSymbol;
 
-	public CalcRow(String title, boolean printPourcentageSymbol) {
+	/**
+	 * Defines a CalcRow
+	 * 
+	 * @param title
+	 *            Title of the row
+	 * @param printPercentageSymbol
+	 *            The boolean indicates whether the values of the columns are
+	 *            percentages
+	 */
+	public CalcRow(String title, boolean printPercentageSymbol) {
 		super(title);
 
-		this.printPourcentageSymbol = printPourcentageSymbol;
+		this.printPercentageSymbol = printPercentageSymbol;
 
 		initArray();
 		disabledCells();
@@ -31,19 +43,33 @@ public class CalcRow extends Row {
 		}
 	}
 
-	public boolean setElementAt(int index, double value) {
-		boolean isModified = index > 0 && index < arrayForARow.length;
+	/**
+	 * Changes a value of a column
+	 * 
+	 * @param column
+	 *            The column
+	 * @param value
+	 *            The value
+	 * @return true if the value has been changed
+	 */
+	public boolean setElementAt(int column, double value) {
+		boolean isModified = column > 0 && column < arrayForARow.length;
 		String stringFormatted = NUMBER_FORMAT_IN_POURCENT.format(value);
 
 		if (isModified) {
-			if (printPourcentageSymbol)
+			if (printPercentageSymbol)
 				stringFormatted += "%";
 
-			arrayForARow[index].setText(stringFormatted);
+			arrayForARow[column].setText(stringFormatted);
 		}
 		return isModified;
 	}
 
+	/**
+	 * Returns the values sum of the row
+	 * 
+	 * @return The sum
+	 */
 	public double sumRow() {
 		double sumOfRow = 0;
 
@@ -56,7 +82,7 @@ public class CalcRow extends Row {
 			sumOfRow += valueOfTheCell;
 		}
 
-		if (printPourcentageSymbol)
+		if (printPercentageSymbol)
 			sumOfRow /= 12;
 
 		return sumOfRow;

@@ -5,7 +5,7 @@ import java.io.Serializable;
 import javax.persistence.Embedded;
 
 /**
- * Cette classe repr�sente une prestation
+ * This class represents a benefit with a number and a time
  **/
 public class Record implements Serializable {
 
@@ -15,7 +15,7 @@ public class Record implements Serializable {
 	private Time time;
 
 	/**
-	 * Construit un Record
+	 * Defines a record with defaults number and time
 	 **/
 	public Record() {
 		number = 0;
@@ -23,12 +23,12 @@ public class Record implements Serializable {
 	}
 
 	/**
-	 * Construit un Record
+	 * Defines a record with the number and time specified
 	 * 
 	 * @param number
-	 *            Valeur de la prestation
+	 *            Value of the benefit
 	 * @param time
-	 *            P�riode de la prestation
+	 *            Time of the benefit
 	 **/
 	public Record(double number, Time time) {
 		this.number = number;
@@ -36,11 +36,11 @@ public class Record implements Serializable {
 	}
 
 	/**
-	 * Modifie la valeur du Record
+	 * Set the record value
 	 * 
 	 * @param number
-	 *            Nouvelle valeur du Record
-	 * @return true si la modification a pu �tre effectu�e
+	 *            new record value
+	 * @return true if the update is successful
 	 **/
 	public boolean setNumber(double number) {
 		boolean isModified = (number >= 0);
@@ -52,29 +52,29 @@ public class Record implements Serializable {
 	}
 
 	/**
-	 * Permet d'obtenir la valeur du Record
+	 * Returns the record value
 	 * 
-	 * @return La valeur
+	 * @return The value
 	 **/
 	public double getNumber() {
 		return number;
 	}
 
 	/**
-	 * Permet d'obtenir la p�riode du Record
+	 * Returns the record time
 	 * 
-	 * @return La p�riode
+	 * @return The time
 	 **/
 	public Time getTime() {
 		return time;
 	}
 
 	/**
-	 * Compare par �galit� deux Record
+	 * Compares this Record to the specified object
 	 * 
 	 * @param o
-	 *            Objet � qui repr�sente un Record
-	 * @return true si les deux �l�ments sont �gaux
+	 *            The object to compare this Record against
+	 * @return true if the Record are equal; false otherwise.
 	 **/
 	@Override
 	public boolean equals(Object o) {

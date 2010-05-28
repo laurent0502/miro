@@ -11,19 +11,19 @@ import miro.shared.GreetingService;
 import miro.shared.Lock;
 import miro.shared.Person;
 
-import org.apache.log4j.Logger;
-
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Query;
 
+/**
+ * This class represents the server contains the methods of the RPC
+ */
 @SuppressWarnings("serial")
 public class GreetingServiceImpl extends RemoteServiceServlet implements
 		GreetingService {
-	Logger logger = Logger.getLogger(GreetingServiceImpl.class);
-	
+	Calendar calendar = new GregorianCalendar();
 
 	static {
 		ObjectifyService.register(Lock.class);
@@ -31,7 +31,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		ObjectifyService.register(Assignment.class);
 
 		Objectify ofy = ObjectifyService.begin();
-		
+
 		if (ofy.query(Connection.class).countAll() == 0) {
 
 			Objectify obj = ObjectifyService.beginTransaction();
@@ -42,20 +42,24 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 
 			obj.getTxn().commit();
 		}
-		
-		if(ofy.query(Lock.class).countAll() == 0){
-			
+
+		if (ofy.query(Lock.class).countAll() == 0) {
+
 			Objectify obj = ObjectifyService.beginTransaction();
 			obj.put(new Lock(1l));
 			obj.getTxn().commit();
 		}
 	}
 
-	String error = "";
-	Calendar calendar = new GregorianCalendar();
-
+	/**
+	 * Set the lock of the database
+	 * 
+	 * @param locked
+	 *            the boolean state of the lock
+	 * @throws IllegalArgumentException
+	 *             If the current state of lock and the new state is on true
+	 */
 	public void setLocked(boolean locked) throws IllegalArgumentException {
-		// ObjectifyService.register(Lock.class);
 		Objectify ofy = ObjectifyService.begin();
 		Lock lock = (Lock) ofy.find(new Key(Lock.class, 1));
 
@@ -71,6 +75,11 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		ofy.put(lock);
 	}
 
+	/**
+	 * Returns the assignments list
+	 * 
+	 * @return The list
+	 */
 	public List<Assignment> getAssignments() {
 		List<Assignment> assignmentList = new ArrayList<Assignment>();
 
@@ -85,34 +94,35 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		return assignmentList;
 	}
 
-	// private void test() {
-	// }
-
+	/**
+	 * Update the assignment list from the person list and assignment list
+	 * 
+	 * @param personList
+	 *            The person list
+	 * @param assignmentList
+	 *            The assignment list
+	 */
 	public void updateAssignments(List<Person> personList,
 			List<Assignment> assignmentList) {
-		// Récupération des assignments actuel de la BD
-		List<Assignment> assignmentList2 = getAssignments();
+		// Getting the assignmentList
+		List<Assignment> assignmentListFromDB = getAssignments();
 
 		for (Assignment assignment : assignmentList) {
 
-			// Si l'assignment existait déja dans la bd,il faut juste
-			// modifier les prestations,sinon,il faut le rajouter à
-			// la liste actuelle d'assignment
-			if (assignmentList2.contains(assignment)) {
-				int indexOf = assignmentList2.indexOf(assignment);
-				Assignment assignment2 = assignmentList2.get(indexOf);
+			if (assignmentListFromDB.contains(assignment)) {
+				int indexOf = assignmentListFromDB.indexOf(assignment);
+				Assignment assignment2 = assignmentListFromDB.get(indexOf);
 
 				for (int i = 0; i < 12; i++) {
 					assignment2.setPrestation(i, assignment.getPrestation(i));
 				}
 			} else {
-				assignmentList2.add(assignment);
+				assignmentListFromDB.add(assignment);
 			}
 		}
-		// Mise à jour des informations propres à chaque personne
-		updateInfosPersonInAssignmentList(personList, assignmentList2);
+		updateInfosPersonInAssignmentList(personList, assignmentListFromDB);
 
-		putData(assignmentList2);
+		putData(assignmentListFromDB);
 
 		setLocked(false);
 	}
@@ -132,19 +142,29 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	void putData(List<Assignment> assignmentList) {
-		
+	private void putData(List<Assignment> assignmentList) {
 
 		for (Assignment assignment : assignmentList) {
 			Objectify ofy = ObjectifyService.beginTransaction();
-			ofy.put(assignment);
-			ofy.getTxn().commit();
+
+			try {
+				ofy.put(assignment);
+				ofy.getTxn().commit();
+			} catch (Exception e) {
+				ofy.put(assignment);
+				ofy.getTxn().commit();
+			}
 		}
 
 	}
 
+	/**
+	 * Returns the connection list
+	 * 
+	 * @return The list
+	 */
 	public List<Connection> getConnections() {
-		
+
 		List<Connection> connectionList = new ArrayList<Connection>();
 
 		Objectify ofy = ObjectifyService.begin();
@@ -158,10 +178,20 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		return connectionList;
 	}
 
+	/**
+	 * Returns the current month
+	 * 
+	 * @return The current month
+	 */
 	public String getMonthOfDate() {
 		return "" + (calendar.get(GregorianCalendar.MONTH) + 1);
 	}
 
+	/**
+	 * Returns the current year
+	 * 
+	 * @return The current year
+	 */
 	public String getYearOfDate() {
 		return "" + calendar.get(GregorianCalendar.YEAR);
 	}

@@ -27,6 +27,9 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
 
+/**
+ * This class represents the servlet which parse the uploaded file
+ */
 public class SampleUploadServlet extends HttpServlet {
 	private Time time;
 	private List<Person> personList = new ArrayList<Person>();
@@ -34,26 +37,23 @@ public class SampleUploadServlet extends HttpServlet {
 	private GreetingServiceImpl greetingService = new GreetingServiceImpl();
 
 	/**
-	 * Methode appelee lorsque l'utilisateur soumet un fichier au serveur
+	 * Method receiving the request
 	 * 
 	 * @param request
-	 *            Requete demandee
+	 *            The request
 	 * @param response
-	 *            Reponse de la requete
+	 *            The response
 	 * @throws ServletException
-	 *             Si les informations contenues dans le fichier ne concerne pas
-	 *             un mois precedent de l'annee courante
+	 *             If the file structure is not correct
 	 **/
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException {
 
 		assignmentList = greetingService.getAssignments();
-		/*
-		 * recuperation dans assignmentList des personnes afin de les mettre
-		 * dans l'attribut global personList
-		 */
+
 		setPersonList();
 		ServletFileUpload upload = new ServletFileUpload();
+
 		try {
 
 			FileItemIterator it = upload.getItemIterator(request);
@@ -61,12 +61,18 @@ public class SampleUploadServlet extends HttpServlet {
 			while (it.hasNext()) {
 				FileItemStream item = it.next();
 
-				parseFile(item);// list = new AssignmentParser(file).parse(item)
+				parseFile(item);
 
 				for (Assignment assignment : assignmentList) {
 					Objectify ofy = ObjectifyService.beginTransaction();
-					ofy.put(assignment);
-					ofy.getTxn().commit();
+					try {
+						ofy.put(assignment);
+						ofy.getTxn().commit();
+					} catch (Exception e) {
+						ofy.put(assignment);
+						ofy.getTxn().commit();
+					}
+
 				}
 			}
 		} catch (IOException e) {
@@ -76,12 +82,6 @@ public class SampleUploadServlet extends HttpServlet {
 		}
 	}
 
-	/**
-	 * Decode la premiere ligne du fichier
-	 * 
-	 * @param line
-	 *            Premiere ligne du fichier
-	 **/
 	private void decodeFirstLineOfFile(String line) {
 		List<String> itemList = getItemsOfLine(line);
 		String lastAndFirstName = itemList.get(0);
@@ -99,14 +99,6 @@ public class SampleUploadServlet extends HttpServlet {
 				activityName, prestationForMonth);
 	}
 
-	/**
-	 * Permet de retrouver la personne avec ses informations d'apres son nom et
-	 * son prenom
-	 * 
-	 * @param lastAndFirstName
-	 *            Nom et prenom de la personne
-	 * @return La personne
-	 **/
 	private Person getPerson(String lastAndFirstName) {
 		int indexSpacing = lastAndFirstName.indexOf(" ");
 		String lastName = lastAndFirstName.substring(0, indexSpacing);
@@ -120,13 +112,6 @@ public class SampleUploadServlet extends HttpServlet {
 		return personList.get(indexOfPerson);
 	}
 
-	/**
-	 * Permet d'ajouter une personne e la liste des personnes
-	 * 
-	 * @param lastAndFirstName
-	 *            Nom et prenom de la personne
-	 * @return true si la personne a pu etre ajoutee
-	 **/
 	private boolean addPerson(String lastAndFirstName) {
 		int indexSpacing = lastAndFirstName.indexOf(" ");
 		String lastName = lastAndFirstName.substring(0, indexSpacing);
@@ -140,12 +125,6 @@ public class SampleUploadServlet extends HttpServlet {
 		return isAdded;
 	}
 
-	/**
-	 * Permet de decoder une ligne du fichier
-	 * 
-	 * @param line
-	 *            Ligne du fichier
-	 **/
 	private void decodeLine(String line) {
 		List<String> itemList = getItemsOfLine(line);
 		String lastAndFirstName = itemList.get(0);
@@ -159,15 +138,6 @@ public class SampleUploadServlet extends HttpServlet {
 				activityName, prestationForMonth);
 	}
 
-	/**
-	 * Permet de parcourir le fichier
-	 * 
-	 * @param item
-	 *            Objet qui represente le fichier e parcourir
-	 * @throws ServletException
-	 *             Si les informations contenues dans le fichier ne concerne pas
-	 *             un mois precedent de l'annee courante
-	 **/
 	private void parseFile(FileItemStream item) throws ServletException,
 			IOException {
 		InputStream stream = item.openStream();
@@ -182,8 +152,8 @@ public class SampleUploadServlet extends HttpServlet {
 
 			decodeFirstLineOfFile(line);
 
-			// Si la periode des informations du fichier est incorrect,une
-			// exception est lancee
+			// If the file don't contains informations of previous month,throw
+			// exception
 			if (!isPeriodOfFileCorrect()) {
 				throw new ServletException("Periode du fichier invalide !!!");
 			}
@@ -195,12 +165,6 @@ public class SampleUploadServlet extends HttpServlet {
 		}
 	}
 
-	/**
-	 * Indique si les informations contenues dans le fichier concerne bien un
-	 * mois precedent de l'annee courante
-	 * 
-	 * @return true si il s'agit d'informations antecedentes
-	 **/
 	private boolean isPeriodOfFileCorrect() {
 		String month = greetingService.getMonthOfDate();
 		String year = greetingService.getYearOfDate();
@@ -209,13 +173,6 @@ public class SampleUploadServlet extends HttpServlet {
 				&& time.getYear() == Integer.parseInt(year);
 	}
 
-	/**
-	 * Decortique une ligne du fichier afin de mettre le resultat dans une liste
-	 * 
-	 * @param line
-	 *            Ligne du fichier
-	 * @return La liste
-	 **/
 	private List<String> getItemsOfLine(String line) {
 		List<String> itemList = new ArrayList<String>();
 
@@ -232,14 +189,6 @@ public class SampleUploadServlet extends HttpServlet {
 		return itemList;
 	}
 
-	/**
-	 * Modifie l'attribut Time contenu en global
-	 * 
-	 * @param yearTxt
-	 *            Represente l'annee
-	 * @param monthTxt
-	 *            Repesente le mois
-	 **/
 	private void setTime(String yearTxt, String monthTxt) {
 		int year = Integer.parseInt(yearTxt);
 		int month = Integer.parseInt(monthTxt);
@@ -288,9 +237,6 @@ public class SampleUploadServlet extends HttpServlet {
 		}
 	}
 
-	/**
-	 * Modifie la liste des personnes en se basant sur la liste des assignements
-	 **/
 	private void setPersonList() {
 		personList.clear();
 		for (Assignment assignment : assignmentList) {

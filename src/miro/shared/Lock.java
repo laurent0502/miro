@@ -3,8 +3,7 @@ package miro.shared;
 import javax.persistence.Id;
 
 /**
- * Cette classe représente un objet pour représenter le verouillage en écriture
- * de la base de données
+ * This class defines a Lock for the database
  **/
 public class Lock {
 
@@ -14,35 +13,35 @@ public class Lock {
 	private boolean isLocked = false;
 
 	/**
-	 * Contruit un Lock par défaut
+	 * Defines a Lock with the boolean equals 'false'
 	 **/
 	public Lock() {
 	}
 
 	/**
-	 * Construit un Lock
+	 * Defines a Lock with an login specified
 	 * 
 	 * @param id
-	 *            Identifiant du Lock
+	 *            Login of Lock
 	 **/
 	public Lock(Long id) {
 		this.id = id;
 	}
 
 	/**
-	 * Dit si le Lock est verouillé
+	 * Return the boolean saying if the database is lock
 	 * 
-	 * @return true si le Lock est verouillé
+	 * @return true If the database is lock
 	 **/
 	public boolean isLocked() {
 		return isLocked;
 	}
 
 	/**
-	 * Modifie le verouillage du Lock
+	 * Set the lock of the database
 	 * 
 	 * @param isLocked
-	 *            Indique si le Lock est vérouillé
+	 *            New lock of the database
 	 **/
 	public void setLocked(boolean isLocked) {
 		this.isLocked = isLocked;

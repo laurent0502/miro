@@ -3,6 +3,9 @@ package miro.client.view;
 import miro.shared.Person;
 import miro.shared.Project;
 
+/**
+ * This class contains a set of informations for the application
+ */
 public class PartagedDataBetweenPanel {
 
 	static boolean hasChangedView = true;

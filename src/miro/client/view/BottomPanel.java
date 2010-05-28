@@ -8,18 +8,22 @@ import miro.shared.Assignment;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.Window.ClosingEvent;
-import com.google.gwt.user.client.Window.ClosingHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
+/**
+ * This class represents the panel containing the south components of the
+ * application.Its contains two buttons : save and lock
+ */
 public class BottomPanel extends Composite implements EventListener {
 
 	private static BottomPanelUiBinder uiBinder = GWT
@@ -44,23 +48,24 @@ public class BottomPanel extends Composite implements EventListener {
 		@Override
 		public void onFailure(Throwable caught) {
 			Window.alert("Impossible d'obtenir les informations !");
-			
+
 			PartagedDataBetweenPanel.isLocked = true;
 			PartagedDataBetweenPanel.isSaving = false;
 		}
 
 		@Override
 		public void onSuccess(List<Assignment> result) {
-			Window.alert("Les donnees ont ete sauvegardes avec succes ! ");
-			
+
 			PartagedDataBetweenPanel.isLocked = false;
 			PartagedDataBetweenPanel.isSaving = false;
-			
+
 			lockButton.setEnabled(true);
 			saveButton.setEnabled(false);
 
 			MiroState.updateViewState(result);
 			notifyListeners();
+
+			Window.alert("Les donnees ont ete sauvegardes avec succes ! ");
 		}
 	};
 
@@ -77,23 +82,30 @@ public class BottomPanel extends Composite implements EventListener {
 		}
 	};
 
+	/**
+	 * Defines a BottomPanel
+	 */
 	public BottomPanel() {
 		initWidget(uiBinder.createAndBindUi(this));
+
+		/*
+		 * Initialize the absolute panel which position children absolutely
+		 */
 		initAbsolutePanel();
+
 		initWindowCloseListener();
 
 		TopPanel.addEventListener(this);
 	}
 
+	/**
+	 * Adds the specified event listener
+	 * 
+	 * @param eventListener
+	 *            The event listener
+	 */
 	public static void addEventListener(EventListener eventListener) {
 		listenersList.add(eventListener);
-	}
-
-	private void ajustButtons() {
-		if (PartagedDataBetweenPanel.isReadOnly) {
-			lockButton.setVisible(false);
-			saveButton.setVisible(false);
-		}
 	}
 
 	private void notifyListeners() {
@@ -104,9 +116,10 @@ public class BottomPanel extends Composite implements EventListener {
 
 	@UiHandler("saveButton")
 	void onClick(ClickEvent e) {
-		//PartagedDataBetweenPanel.isLocked = false;
 		PartagedDataBetweenPanel.isSaving = true;
+
 		notifyListeners();
+
 		MiroAccessDB.updateAssignments(MiroState.getPersonList(), MiroState
 				.getAssignmentList(), UPDATE_ASSIGNMENT_CALLBACK);
 	}
@@ -119,14 +132,17 @@ public class BottomPanel extends Composite implements EventListener {
 			@Override
 			public void onFailure(Throwable caught) {
 				PartagedDataBetweenPanel.isLocked = false;
+
 				Window.alert(caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(Object result) {
 				PartagedDataBetweenPanel.isLocked = true;
+
 				lockButton.setEnabled(false);
 				saveButton.setEnabled(true);
+
 				notifyListeners();
 			}
 		};
@@ -138,7 +154,10 @@ public class BottomPanel extends Composite implements EventListener {
 		absolutePanel.setWidgetPosition(lockButton, 25, 0);
 		absolutePanel.setWidgetPosition(saveButton, 90, 0);
 
-		ajustButtons();
+		if (PartagedDataBetweenPanel.isReadOnly) {
+			lockButton.setVisible(false);
+			saveButton.setVisible(false);
+		}
 	}
 
 	private void initWindowCloseListener() {
@@ -146,6 +165,8 @@ public class BottomPanel extends Composite implements EventListener {
 
 			@Override
 			public void onFailure(Throwable caught) {
+				Window
+						.alert("Impossible de deverrouiller la base de donnees !");
 			}
 
 			@Override
@@ -153,13 +174,13 @@ public class BottomPanel extends Composite implements EventListener {
 			}
 		};
 
-		Window.addWindowClosingHandler(new ClosingHandler() {
+		Window.addCloseHandler(new CloseHandler() {
 
 			@Override
-			public void onWindowClosing(ClosingEvent event) {
+			public void onClose(CloseEvent event) {
 				/*
-				 * Si le lock est actif lorsqu'on ferme l'application,il faut le
-				 * rendre inactif
+				 * If the lock button is disabled while the application is
+				 * closing,it must be enabled
 				 */
 				if (!lockButton.isEnabled()) {
 					MiroAccessDB.setLocked(false, CLOSING_WINDOWS_CALLBACK);
@@ -168,6 +189,12 @@ public class BottomPanel extends Composite implements EventListener {
 		});
 	}
 
+	/**
+	 * Implemented method by all listeners
+	 * 
+	 * @param widget
+	 *            The widget sending the event
+	 */
 	@Override
 	public void notifyChange(Widget widget) {
 
